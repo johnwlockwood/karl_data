@@ -1,5 +1,6 @@
 import csv
 from itertools import ifilter, takewhile
+import json
 import os
 from karld.itertools_utils import grouper
 

@@ -82,7 +82,10 @@ def get_first_if_any(values):
 
 def get_first_type_instance_of_group(instance_type, group):
     key_value, items = group
-    return get_first_if_any(filter(lambda vs: isinstance(vs, instance_type), items))
+    try:
+        return get_first_if_any(filter(lambda vs: isinstance(vs, instance_type), items))
+    except ValueError:
+        logging.exception("couldn't unpack {0}".format(group))
 
 
 def i_get_multi_groups(iterables, key=None):

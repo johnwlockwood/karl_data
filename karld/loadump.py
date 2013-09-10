@@ -8,6 +8,8 @@ LINE_BUFFER_SIZE = 5000
 
 
 def i_get_csv_data(file_name, *args, **kwargs):
+    """A generator for reading a csv file.
+    """
     with open(file_name, 'r') as csv_file:
         reader = csv.reader(csv_file, *args, **kwargs)
         for row in reader:
@@ -40,6 +42,10 @@ def dump_dicts_to_json_file(file_name, dicts):
 
 
 def split_file_output_json(filename, dict_list, max_lines=1100):
+    """
+    Split an iterable of JSON serializable rows of data
+     into groups and write each to a shard.
+    """
     groups = grouper(dict_list, max_lines, fillvalue=None)
     dirname = os.path.dirname(filename)
     basename = os.path.basename(filename)
@@ -51,6 +57,10 @@ def split_file_output_json(filename, dict_list, max_lines=1100):
 
 
 def split_file_output_csv(filename, data, max_lines=1100, out_dir=None):
+    """
+    Split an iterable of csv serializable rows of data
+     into groups and write each to a csv shard.
+    """
     groups = grouper(data, max_lines, fillvalue=None)
     dirname = os.path.abspath(os.path.dirname(filename))
     if out_dir is None:
@@ -61,3 +71,35 @@ def split_file_output_csv(filename, data, max_lines=1100, out_dir=None):
         write_as_csv(
             dict_group,
             os.path.join(out_dir, "{0}_{1}".format(index, basename)))
+
+
+def split_file_output(filename, data, max_lines=1100, out_dir=None):
+    """
+    Split an iterable lines into groups and write each to
+    a shard.
+    """
+    groups = grouper(data, max_lines, fillvalue=None)
+    dirname = os.path.abspath(os.path.dirname(filename))
+    if out_dir is None:
+        out_dir = dirname
+    basename = os.path.basename(filename)
+    for index, group in enumerate(groups):
+        dict_group = takewhile(lambda x: x is not None, group)
+        with open(os.path.join(out_dir, "{0}_{1}".format(index, basename)), 'wt') as shard_file:
+            shard_file.write("".join(dict_group))
+
+
+def split_file(data_path, filename,  max_lines=200000, out_dir=None):
+    """
+    Opens then shards the file.
+    """
+    full_dir = os.path.join(data_path, filename)
+    if out_dir is None:
+        out_dir = data_path
+    else:
+        if not os.path.exists(out_dir):
+            os.makedirs(out_dir)
+
+    with open(full_dir, 'r') as data_file:
+        data = (line for line in data_file)
+        split_file_output(filename, data, max_lines=max_lines, out_dir=out_dir)

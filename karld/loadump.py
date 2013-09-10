@@ -50,12 +50,14 @@ def split_file_output_json(filename, dict_list, max_lines=1100):
             dict_group)
 
 
-def split_file_output_csv(filename, dict_list, max_lines=1100):
-    groups = grouper(dict_list, max_lines, fillvalue=None)
-    dirname = os.path.dirname(filename)
+def split_file_output_csv(filename, data, max_lines=1100, out_dir=None):
+    groups = grouper(data, max_lines, fillvalue=None)
+    dirname = os.path.abspath(os.path.dirname(filename))
+    if out_dir is None:
+        out_dir = dirname
     basename = os.path.basename(filename)
     for index, group in enumerate(groups):
         dict_group = takewhile(lambda x: x is not None, group)
         write_as_csv(
             dict_group,
-            os.path.join(dirname, "{0}_{1}".format(index, basename)))
+            os.path.join(out_dir, "{0}_{1}".format(index, basename)))

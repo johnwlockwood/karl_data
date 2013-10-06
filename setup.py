@@ -14,6 +14,12 @@ if sys.argv[-1] == 'publish':
 
 
 def read(fname):
+    """
+    Open and read a filename in this directory.
+    :param fname: `str` file name in this directory
+
+    Returns contents of file fname
+    """
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 
@@ -35,10 +41,13 @@ setup(
     keywords="example documentation tutorial",
     url="https://github.com/johnwlockwood/karl_data",
     packages=['karld', 'tests'],
+    package_dir={'karld': 'karld'},
     install_requires=requires,
     long_description=read('README.md'),
     classifiers=[
-        'Intended Audience :: Data Wranglers',
+        'Development Status :: 3 - Alpha',
+        'Intended Audience :: Developers',
+        'Intended Audience :: Science/Research',
         'Natural Language :: English',
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python',

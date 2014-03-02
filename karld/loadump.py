@@ -116,3 +116,15 @@ def split_file(file_path, out_dir=None, max_lines=200000):
     with open(file_path, 'r') as data_file:
         data = (line for line in data_file)
         split_file_output(base_name, data, out_dir, max_lines=max_lines)
+
+
+def i_walk_dir_for_filepaths_names(root_dir):
+    """
+    Walks a directory yielding the paths and names
+    of files.
+
+    :param root_dir: :class: `str` path to a directory.
+    """
+    for subdir, dirs, files in os.walk(root_dir):
+        for fi in files:
+            yield os.path.join(subdir, fi), fi

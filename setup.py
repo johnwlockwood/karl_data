@@ -1,7 +1,7 @@
 import os
 import sys
 
-VERSION = '0.0.4'
+VERSION = '0.0.5'
 
 try:
     from setuptools import setup
@@ -32,7 +32,7 @@ except:
 
 setup(
     name="karld",
-    version="0.0.4",
+    version=VERSION,
     author="John W Lockwood IV",
     author_email="john@tackletronics.com",
     description=("Doing some data things "

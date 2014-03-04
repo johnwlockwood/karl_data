@@ -3,7 +3,7 @@ import unittest
 from itertools_recipes import take
 from mock import patch, Mock
 
-from karld.run_together import csv_file_to_file
+from ..run_together import csv_file_to_file
 
 
 class TestCSVFileToFile(unittest.TestCase):

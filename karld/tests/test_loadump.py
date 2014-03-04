@@ -1,6 +1,7 @@
 import unittest
 from mock import patch
-from karld.loadump import i_walk_dir_for_filepaths_names, ensure_dir
+from ..loadump import ensure_dir
+from ..loadump import i_walk_dir_for_filepaths_names
 
 
 class TestDirectoryFunctions(unittest.TestCase):

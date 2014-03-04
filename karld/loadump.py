@@ -8,6 +8,17 @@ from itertools_recipes import grouper
 LINE_BUFFER_SIZE = 5000
 
 
+def ensure_dir(directory):
+    """
+    If directory doesn't exist, make it.
+
+    :param directory: path to directory
+    :type directory: `str`
+    """
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+
 def i_get_csv_data(file_name, *args, **kwargs):
     """A generator for reading a csv file.
     """

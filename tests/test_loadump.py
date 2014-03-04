@@ -1,9 +1,12 @@
 import unittest
 from mock import patch
-from karld.loadump import i_walk_dir_for_filepaths_names
+from karld.loadump import i_walk_dir_for_filepaths_names, ensure_dir
 
 
-class TestDirectoryWalker(unittest.TestCase):
+class TestDirectoryFunctions(unittest.TestCase):
+    """
+    Test directory handling functions.
+    """
     @patch('os.walk')
     def test_i_walk_dir_for_filepaths_names(self, mock_walk):
         """
@@ -30,3 +33,36 @@ class TestDirectoryWalker(unittest.TestCase):
 
         mock_walk.assert_called_once_with("fake")
 
+    @patch('os.path.exists')
+    @patch('os.makedirs')
+    def test_ensure_dir_makesdirs_with_none(self, mock_makedirs, mock_exists):
+        """
+        When a directory doesn't exist according to os.path.exists
+        call makedirs with it.
+        """
+        mock_exists.return_value = False
+
+        directory = "a/directory"
+
+        ensure_dir(directory)
+
+        mock_exists.assert_called_once_with(directory)
+        mock_makedirs.assert_called_once_with(directory)
+
+    @patch('os.path.exists')
+    @patch('os.makedirs')
+    def test_ensure_dir_not_makesdirs_when_exists(self,
+                                                  mock_makedirs,
+                                                  mock_exists):
+        """
+        When a directory exists according to os.path.exists
+        do not call makedirs with it.
+        """
+        mock_exists.return_value = True
+
+        directory = "a/directory"
+
+        ensure_dir(directory)
+
+        mock_exists.assert_called_once_with(directory)
+        self.assertFalse(mock_makedirs.call_count)

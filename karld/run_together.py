@@ -21,8 +21,6 @@ def csv_file_to_file(csv_rows_consumer, out_prefix, out_dir, file_path_name):
     """
     data_path, data_file_name = file_path_name
     data_items = i_get_csv_data(data_path)
-    data_dir = os.path.dirname(data_path)
-    out_dir = out_dir or data_dir
     ensure_dir(out_dir)
     out_filename = os.path.join(
         out_dir, '{}{}'.format(

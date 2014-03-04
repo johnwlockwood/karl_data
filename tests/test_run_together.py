@@ -24,7 +24,7 @@ class TestCSVFileToFile(unittest.TestCase):
         """
         Ensure csv_file_to_file ensures the out directory,
         then writes as csv to a filename the same as the input
-        filename, but with a prefix and to the out directory
+        filename, but lowercase with a prefix and to the out directory
         the data from the input file as called with
         the csv_row_consumer.
 
@@ -43,7 +43,7 @@ class TestCSVFileToFile(unittest.TestCase):
 
         out_prefix = "yeah_"
         out_dir = "out"
-        file_path_name = ("in/file.csv", "file.csv")
+        file_path_name = ("in/File.csv", "File.csv")
         csv_file_to_file(mock_row_consumer,
                          out_prefix,
                          out_dir,

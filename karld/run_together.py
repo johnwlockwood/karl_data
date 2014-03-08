@@ -28,6 +28,32 @@ def csv_file_to_file(csv_rows_consumer, out_prefix, out_dir, file_path_name):
     write_as_csv(csv_rows_consumer(data_items), out_filename)
 
 
+def csv_files_to_file(csv_rows_consumer,
+                      out_prefix,
+                      out_dir,
+                      out_file_name,
+                      file_path_names):
+    """
+    Consume the file at file_path_name as a csv file, passing
+    it through csv_rows_consumer, writing the results
+    as a csv file into out_dir as the same name, lowered, and prefixed.
+
+    :param csv_rows_consumer: consumes data_items yielding collection for each
+    :param out_prefix: :class: `str` prefix out_file_name
+    :param out_dir: :class: `str` directory to write output file to
+    :param out_file_name: :class: `str` output file base name.
+    :param file_path_names: :class: `tuple` of paths to input csv file
+    """
+    data_paths, data_file_names = zip(*file_path_names)
+    data_items = (i_get_csv_data(data_path) for data_path in data_paths)
+
+    ensure_dir(out_dir)
+    out_filename = os.path.join(
+        out_dir, '{}{}'.format(
+            out_prefix, out_file_name.lower()))
+    write_as_csv(csv_rows_consumer(data_items), out_filename, append=True)
+
+
 def pool_run_files_to_files(file_to_file, in_dir):
     """
     With a multi-process pool, map files in in_dir over

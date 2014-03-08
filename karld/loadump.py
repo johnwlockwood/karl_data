@@ -32,6 +32,7 @@ def write_as_csv(items, file_name, append=False, line_buffer_size=None):
     """
     Writes out tuples to a csv file
     """
+    fill_object = object()
     if line_buffer_size is None:
         line_buffer_size = LINE_BUFFER_SIZE
     if append:
@@ -40,9 +41,13 @@ def write_as_csv(items, file_name, append=False, line_buffer_size=None):
         mode = 'wt'
     with open(file_name, mode) as csv_file:
         writer = csv.writer(csv_file)
-        line_groups = grouper(line_buffer_size, items, None)
+        line_groups = grouper(line_buffer_size,
+                              items,
+                              fillvalue=fill_object)
+
         for line_group in line_groups:
-            writer.writerows(takewhile(lambda x: x is not None, line_group))
+            writer.writerows(
+                takewhile(lambda x: x is not fill_object, line_group))
 
 
 def dump_dicts_to_json_file(file_name, dicts):

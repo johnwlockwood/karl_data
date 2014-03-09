@@ -59,10 +59,14 @@ def csv_files_to_file(csv_rows_consumer,
     as a csv file into out_dir as the same name, lowered, and prefixed.
 
     :param csv_rows_consumer: consumes data_items yielding collection for each
-    :param out_prefix: :class: `str` prefix out_file_name
-    :param out_dir: :class: `str` directory to write output file to
-    :param out_file_name: :class: `str` output file base name.
-    :param file_path_names: :class: `tuple` of paths to input csv file
+    :param out_prefix: prefix out_file_name
+    :type out_prefix: `str`
+    :param out_dir: Directory to write output file to.
+    :type out_dir: `str`
+    :param out_file_name: Output file base name.
+    :type out_file_name: `str`
+    :param file_path_names: `tuple` of paths and basenames to input csv files
+    :type file_path_names: `tuple`
     """
     ensure_dir(out_dir)
     out_filename = os.path.join(

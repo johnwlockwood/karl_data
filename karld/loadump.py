@@ -19,6 +19,15 @@ def ensure_dir(directory):
         os.makedirs(directory)
 
 
+def ensure_file_path_dir(file_path):
+    """
+    Ensure the parent directory of the file path.
+
+    :param file_path: :class: `str` path to file.
+    """
+    ensure_dir(os.path.abspath(os.path.dirname(file_path)))
+
+
 def i_get_csv_data(file_name, *args, **kwargs):
     """A generator for reading a csv file.
     """
@@ -126,8 +135,7 @@ def split_file(file_path, out_dir=None, max_lines=200000):
         # input file.
         out_dir = dir_name
     else:
-        if not os.path.exists(out_dir):
-            os.makedirs(out_dir)
+        ensure_dir(out_dir)
 
     with open(file_path, 'r') as data_file:
         data = (line for line in data_file)

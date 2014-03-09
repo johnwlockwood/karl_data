@@ -3,6 +3,7 @@ import os
 from concurrent.futures import ProcessPoolExecutor
 
 from .loadump import ensure_dir
+from .loadump import ensure_file_path_dir
 from .loadump import i_walk_dir_for_filepaths_names
 from .loadump import i_get_csv_data
 from .loadump import write_as_csv
@@ -28,6 +29,24 @@ def csv_file_to_file(csv_rows_consumer, out_prefix, out_dir, file_path_name):
     write_as_csv(csv_rows_consumer(data_items), out_filename)
 
 
+def multi_in_single_out(rows_reader,
+                        rows_writer,
+                        rows_iter_consumer,
+                        out_url,
+                        in_urls_func):
+    """
+    Multi input file combiner.
+
+    :param rows_reader: function to read a file path and returns an iterator
+    :param rows_writer: function to write values
+    :param rows_iter_consumer: function takes iter. of iterators returns iter.
+    :param out_url: url for the rows_writer to write to.
+    :param in_urls_func: function generates iterator of input urls.
+    """
+    data_items_iter = (rows_reader(data_path) for data_path in in_urls_func())
+    rows_writer(rows_iter_consumer(data_items_iter), out_url)
+
+
 def csv_files_to_file(csv_rows_consumer,
                       out_prefix,
                       out_dir,
@@ -51,7 +70,7 @@ def csv_files_to_file(csv_rows_consumer,
     out_filename = os.path.join(
         out_dir, '{}{}'.format(
             out_prefix, out_file_name.lower()))
-    write_as_csv(csv_rows_consumer(data_items), out_filename, append=True)
+    write_as_csv(csv_rows_consumer(data_items), out_filename)
 
 
 def pool_run_files_to_files(file_to_file, in_dir):

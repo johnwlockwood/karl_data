@@ -1,9 +1,10 @@
+from functools import partial
 import os
 
 from concurrent.futures import ProcessPoolExecutor
+from karld.iter_utils import yield_nth_of
 
 from .loadump import ensure_dir
-from .loadump import ensure_file_path_dir
 from .loadump import i_walk_dir_for_filepaths_names
 from .loadump import i_get_csv_data
 from .loadump import write_as_csv
@@ -35,7 +36,7 @@ def multi_in_single_out(rows_reader,
                         out_url,
                         in_urls_func):
     """
-    Multi input file combiner.
+    Multi input combiner.
 
     :param rows_reader: function to read a file path and returns an iterator
     :param rows_writer: function to write values
@@ -63,14 +64,18 @@ def csv_files_to_file(csv_rows_consumer,
     :param out_file_name: :class: `str` output file base name.
     :param file_path_names: :class: `tuple` of paths to input csv file
     """
-    data_paths, data_file_names = zip(*file_path_names)
-    data_items = (i_get_csv_data(data_path) for data_path in data_paths)
-
     ensure_dir(out_dir)
     out_filename = os.path.join(
         out_dir, '{}{}'.format(
             out_prefix, out_file_name.lower()))
-    write_as_csv(csv_rows_consumer(data_items), out_filename)
+
+    in_urls_func = partial(yield_nth_of, 0, file_path_names)
+
+    multi_in_single_out(i_get_csv_data,
+                        write_as_csv,
+                        csv_rows_consumer,
+                        out_filename,
+                        in_urls_func)
 
 
 def pool_run_files_to_files(file_to_file, in_dir):

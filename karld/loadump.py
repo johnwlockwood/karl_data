@@ -1,5 +1,7 @@
 from __future__ import print_function
 import csv
+from functools import partial
+from itertools import imap
 from itertools import takewhile
 import json
 import os
@@ -142,13 +144,19 @@ def split_file(file_path, out_dir=None, max_lines=200000):
         split_file_output(base_name, data, out_dir, max_lines=max_lines)
 
 
+def file_path_and_base_name(path, base_name):
+    return os.path.join(path, base_name), base_name
+
+
 def i_walk_dir_for_filepaths_names(root_dir):
     """
     Walks a directory yielding the paths and names
     of files.
 
-    :param root_dir: :class: `str` path to a directory.
+    :param root_dir: path to a directory.
+    :type root_dir: `str`
     """
     for subdir, dirs, files in os.walk(root_dir):
-        for fi in files:
-            yield os.path.join(subdir, fi), fi
+        for path, base_name in imap(
+                partial(file_path_and_base_name, subdir), files):
+            yield path, base_name

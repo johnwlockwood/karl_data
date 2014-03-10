@@ -1,9 +1,11 @@
 from __future__ import print_function
 import csv
 from functools import partial
+from itertools import chain
 from itertools import imap
 from itertools import takewhile
 import json
+from operator import itemgetter
 import os
 from itertools_recipes import grouper
 
@@ -66,7 +68,7 @@ def dump_dicts_to_json_file(file_name, dicts):
     to a line of the file as json."""
     with open(file_name, 'w+') as json_file:
         for item in dicts:
-            json_file.write(json.dumps(item)+"\n")
+            json_file.write(json.dumps(item) + "\n")
 
 
 def split_file_output_json(filename, dict_list, max_lines=1100):
@@ -144,7 +146,15 @@ def split_file(file_path, out_dir=None, max_lines=200000):
         split_file_output(base_name, data, out_dir, max_lines=max_lines)
 
 
-def file_path_and_base_name(path, base_name):
+def file_path_and_name(path, base_name):
+    """
+    Join the path and base_name and yield it and the base_name.
+
+    :param path: `str` directory path
+    :param base_name: `str` file name
+
+    :return: `tuple` of file path and file name.
+    """
     return os.path.join(path, base_name), base_name
 
 
@@ -156,7 +166,6 @@ def i_walk_dir_for_filepaths_names(root_dir):
     :param root_dir: path to a directory.
     :type root_dir: `str`
     """
-    for subdir, dirs, files in os.walk(root_dir):
-        for path, base_name in imap(
-                partial(file_path_and_base_name, subdir), files):
-            yield path, base_name
+    return chain((imap(partial(file_path_and_name, subdir), files)
+                  for subdir, files
+                  in imap(itemgetter(0, 2), os.walk(root_dir))))

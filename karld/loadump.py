@@ -4,6 +4,8 @@ from functools import partial
 from itertools import chain
 from itertools import imap
 from itertools import takewhile
+from itertools import repeat
+from itertools import starmap
 import json
 from operator import itemgetter
 import os
@@ -158,6 +160,19 @@ def file_path_and_name(path, base_name):
     return os.path.join(path, base_name), base_name
 
 
+def i_walk_dir_for_paths_names(root_dir):
+    """
+    Walks a directory yielding the directory of files
+    and names of files.
+
+    :param root_dir: path to a directory.
+    :type root_dir: `str`
+    """
+    return chain(*(imap(None, repeat(subdir), files)
+                   for subdir, files
+                   in imap(itemgetter(0, 2), os.walk(root_dir))))
+
+
 def i_walk_dir_for_filepaths_names(root_dir):
     """
     Walks a directory yielding the paths and names
@@ -166,6 +181,5 @@ def i_walk_dir_for_filepaths_names(root_dir):
     :param root_dir: path to a directory.
     :type root_dir: `str`
     """
-    return chain((imap(partial(file_path_and_name, subdir), files)
-                  for subdir, files
-                  in imap(itemgetter(0, 2), os.walk(root_dir))))
+    return starmap(file_path_and_name,
+                   i_walk_dir_for_paths_names(root_dir))

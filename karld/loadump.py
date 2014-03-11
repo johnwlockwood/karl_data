@@ -1,5 +1,6 @@
 from __future__ import print_function
 import csv
+from functools import partial
 from itertools import takewhile
 import json
 import os
@@ -19,6 +20,15 @@ def ensure_dir(directory):
         os.makedirs(directory)
 
 
+def is_not(a, b):
+    """
+    logical function to identify if a and b are not the same.
+    :param a: any value
+    :param b: any value
+    """
+    return a is not b
+
+
 def i_get_csv_data(file_name, *args, **kwargs):
     """A generator for reading a csv file.
     """
@@ -30,19 +40,30 @@ def i_get_csv_data(file_name, *args, **kwargs):
 
 def write_as_csv(items, file_name, append=False, line_buffer_size=None):
     """
-    Writes out tuples to a csv file
+    Writes out items to a csv file in groups.
+
+    :param items: An iterable collection of collections.
+    :param file_name: path to the output file.
+    :param append: whether to append or overwrite the file.
+    :param line_buffer_size: number of lines to write at a time.
     """
+    fill_object = object()
+    is_not_fill = partial(is_not, fill_object)
     if line_buffer_size is None:
         line_buffer_size = LINE_BUFFER_SIZE
     if append:
-        mode = 'w+'
+        mode = 'a'
     else:
         mode = 'wt'
     with open(file_name, mode) as csv_file:
         writer = csv.writer(csv_file)
-        line_groups = grouper(line_buffer_size, items, None)
+        line_groups = grouper(line_buffer_size,
+                              items,
+                              fillvalue=fill_object)
+
         for line_group in line_groups:
-            writer.writerows(takewhile(lambda x: x is not None, line_group))
+            writer.writerows(
+                takewhile(is_not_fill, line_group))
 
 
 def dump_dicts_to_json_file(file_name, dicts):

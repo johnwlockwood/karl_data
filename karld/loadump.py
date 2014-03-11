@@ -1,14 +1,19 @@
 from __future__ import print_function
+
 import csv
+import os
+import json
+
 from functools import partial
+
 from itertools import chain
 from itertools import imap
 from itertools import takewhile
 from itertools import repeat
 from itertools import starmap
-import json
+
 from operator import itemgetter
-import os
+
 from itertools_recipes import grouper
 
 LINE_BUFFER_SIZE = 5000
@@ -34,6 +39,15 @@ def ensure_file_path_dir(file_path):
     ensure_dir(os.path.abspath(os.path.dirname(file_path)))
 
 
+def is_not(a, b):
+    """
+    logical function to identify if a and b are not the same.
+    :param a: any value
+    :param b: any value
+    """
+    return a is not b
+
+
 def i_get_csv_data(file_name, *args, **kwargs):
     """A generator for reading a csv file.
     """
@@ -45,13 +59,19 @@ def i_get_csv_data(file_name, *args, **kwargs):
 
 def write_as_csv(items, file_name, append=False, line_buffer_size=None):
     """
-    Writes out tuples to a csv file
+    Writes out items to a csv file in groups.
+
+    :param items: An iterable collection of collections.
+    :param file_name: path to the output file.
+    :param append: whether to append or overwrite the file.
+    :param line_buffer_size: number of lines to write at a time.
     """
     fill_object = object()
+    is_not_fill = partial(is_not, fill_object)
     if line_buffer_size is None:
         line_buffer_size = LINE_BUFFER_SIZE
     if append:
-        mode = 'w+'
+        mode = 'a'
     else:
         mode = 'wt'
     with open(file_name, mode) as csv_file:
@@ -62,7 +82,7 @@ def write_as_csv(items, file_name, append=False, line_buffer_size=None):
 
         for line_group in line_groups:
             writer.writerows(
-                takewhile(lambda x: x is not fill_object, line_group))
+                takewhile(is_not_fill, line_group))
 
 
 def dump_dicts_to_json_file(file_name, dicts):

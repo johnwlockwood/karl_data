@@ -18,6 +18,8 @@ from operator import is_not
 from itertools_recipes import grouper
 
 LINE_BUFFER_SIZE = 5000
+WALK_SUB_DIR = 0
+WALK_FILES = 2
 
 
 def ensure_dir(directory):
@@ -180,9 +182,13 @@ def i_walk_dir_for_paths_names(root_dir):
     :param root_dir: path to a directory.
     :type root_dir: `str`
     """
-    return chain(*(imap(None, repeat(subdir), files)
-                   for subdir, files
-                   in imap(itemgetter(0, 2), os.walk(root_dir))))
+    return chain.from_iterable(
+        (
+            imap(None, repeat(subdir), files)
+            for subdir, files
+            in imap(itemgetter(WALK_SUB_DIR, WALK_FILES), os.walk(root_dir))
+        )
+    )
 
 
 def i_walk_dir_for_filepaths_names(root_dir):

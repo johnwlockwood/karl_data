@@ -13,6 +13,7 @@ from itertools import repeat
 from itertools import starmap
 
 from operator import itemgetter
+from operator import is_not
 
 from itertools_recipes import grouper
 
@@ -37,15 +38,6 @@ def ensure_file_path_dir(file_path):
     :param file_path: :class: `str` path to file.
     """
     ensure_dir(os.path.abspath(os.path.dirname(file_path)))
-
-
-def is_not(a, b):
-    """
-    logical function to identify if a and b are not the same.
-    :param a: any value
-    :param b: any value
-    """
-    return a is not b
 
 
 def i_get_csv_data(file_name, *args, **kwargs):

@@ -156,6 +156,3 @@ class TestFileSystemIntegration(unittest.TestCase):
                  'topaz, mineral',
                  'ruby, mineral',
                  'celery, vegetable'], contents.splitlines())
-
-
-

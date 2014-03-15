@@ -1,4 +1,5 @@
 from datetime import datetime
+from itertools import ifilter
 from operator import itemgetter
 import os
 import tempfile
@@ -9,6 +10,7 @@ from nose.plugins.attrib import attr
 
 from karld.loadump import ensure_dir
 from karld.loadump import i_walk_dir_for_filepaths_names
+from karld.loadump import is_file_csv
 from karld.merger import sort_merge_group
 from karld.run_together import csv_files_to_file
 
@@ -109,7 +111,8 @@ class TestFileSystemIntegration(unittest.TestCase):
     """
     Integration tests against the filesystem.
     """
-    def test_sort_merge(self):
+
+    def test_sort_merge_csv_files_to_file(self):
         """
         Ensure csv_files_to_file will read multiple
         csv files and write one csv file
@@ -126,14 +129,22 @@ class TestFileSystemIntegration(unittest.TestCase):
         prefix = str(datetime.now())
 
         out_filename = "things_combined.csv"
+        input_dir = os.path.join(os.path.dirname(__file__),
+                                 "test_data",
+                                 "things_kinds")
+
+        file_path_names = i_walk_dir_for_filepaths_names(input_dir)
+
+        csv_file_path_names = ifilter(
+            is_file_csv,
+            file_path_names)
 
         csv_files_to_file(
             combine_things,
             prefix,
             out_dir,
             out_filename,
-            i_walk_dir_for_filepaths_names(
-                os.path.join("karld", "tests", "test_data")))
+            csv_file_path_names)
 
         expected_file = os.path.join(out_dir,
                                      "{}{}".format(prefix, out_filename))

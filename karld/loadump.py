@@ -79,6 +79,16 @@ def write_as_csv(items, file_name, append=False, line_buffer_size=None):
                 takewhile(is_not_fill, line_group))
 
 
+def is_file_csv(file_path_name):
+    """
+    Is the file a csv file? Identify by extension.
+
+    :param file_path_name:
+    """
+    _, file_name = file_path_name
+    return file_name[-4:].lower() == '.csv'
+
+
 def dump_dicts_to_json_file(file_name, dicts):
     """writes each dictionary in the dicts iterable
     to a line of the file as json."""

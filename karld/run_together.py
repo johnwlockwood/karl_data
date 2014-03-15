@@ -1,4 +1,5 @@
 from functools import partial
+from itertools import ifilter
 import os
 
 from concurrent.futures import ProcessPoolExecutor
@@ -82,15 +83,21 @@ def csv_files_to_file(csv_rows_consumer,
                         in_urls_func)
 
 
-def pool_run_files_to_files(file_to_file, in_dir):
+def pool_run_files_to_files(file_to_file, in_dir, filter_func=None):
     """
     With a multi-process pool, map files in in_dir over
     file_to_file function.
 
     :param file_to_file: callable that takes file paths.
-    :param in_dir: path to process all files from
+    :param in_dir: path to process all files from.
+    :param filter_func: callable that takes a tuple
+    of path and base name of a file and returns a bool.
     """
     results = i_walk_dir_for_filepaths_names(in_dir)
+    if filter_func:
+        results_final = ifilter(filter_func, results)
+    else:
+        results_final = results
 
     with ProcessPoolExecutor() as pool:
-        list(pool.map(file_to_file, results))
+        list(pool.map(file_to_file, results_final))

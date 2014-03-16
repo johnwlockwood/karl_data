@@ -1,7 +1,9 @@
 import os
 import sys
 
-VERSION = '0.0.8'
+from setuptools import find_packages, setup
+
+from pip.req import parse_requirements
 
 try:
     from setuptools import setup
@@ -23,26 +25,48 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 
-requires = ['itertools-recipes']
+def get_version():
+    import imp
+
+    with open('karld/_meta.py', 'rb') as fp:
+        mod = imp.load_source('_meta', 'karld', fp)
+
+    return mod.version
+
+
+def get_requirements(filename):
+    reqs = parse_requirements(filename)
+
+    return [str(r.req) for r in reqs]
+
+
+def get_install_requires():
+    return get_requirements('requirements.txt')
+
+
+def get_test_requires():
+    return get_requirements('requirements_dev.txt')
+
 
 try:
     license_info = open('LICENSE').read()
 except:
     license_info = 'APACHE 2.0'
 
-setup(
+setup_args = dict(
     name="karld",
-    version=VERSION,
+    version=get_version(),
     author="John W Lockwood IV",
     author_email="john@tackletronics.com",
     description=("Doing some data things "
                  "in a memory efficient manner"),
     license=license_info,
-    keywords="example documentation tutorial",
+    keywords="data",
     url="https://github.com/johnwlockwood/karl_data",
-    packages=['karld', 'tests'],
     package_dir={'karld': 'karld'},
-    install_requires=requires,
+    packages=find_packages(),
+    install_requires=get_install_requires(),
+    tests_require=get_test_requires(),
     long_description=read('README.md'),
     classifiers=[
         'Development Status :: 3 - Alpha',
@@ -54,3 +78,6 @@ setup(
         'Programming Language :: Python :: 2.7',
     ],
 )
+
+if __name__ == '__main__':
+    setup(**setup_args)

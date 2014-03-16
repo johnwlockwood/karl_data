@@ -44,11 +44,11 @@ testall: clean
 
 test: clean unit integrations
 
-build:
+build: distclean
 	python setup.py sdist
 
 build_win:
 	python setup.py bdist_wininst
 
-release: build build_win
-	python setup.py upload -r pypi
+release: distclean
+	python setup.py sdist bdist_wininst upload -r pypi

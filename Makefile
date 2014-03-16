@@ -3,6 +3,7 @@ PYTHON := python
 PIP := pip
 
 BUILD_DIR := ./build
+DIST_DIR := ./dist
 
 clean:
 	find . -name "*.py[co]" -delete
@@ -10,6 +11,7 @@ clean:
 
 distclean: clean
 	rm -rf $(BUILD_DIR)
+	rm -rf $(DIST_DIR)
 
 deps: py_deploy_deps py_dev_deps
 
@@ -35,3 +37,6 @@ testall: clean
 	nosetests --with-coverage
 
 test: clean unit integrations
+
+release:
+	python setup.py sdist bdist_wininst upload -r pypi

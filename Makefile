@@ -2,7 +2,7 @@ SHELL := /bin/bash
 PYTHON := python
 PIP := pip
 
-BUILD_DIR := .build
+BUILD_DIR := ./build
 
 clean:
 	find . -name "*.py[co]" -delete
@@ -11,21 +11,27 @@ clean:
 distclean: clean
 	rm -rf $(BUILD_DIR)
 
-run: deps
-	dev_appserver.py .
+deps: py_deploy_deps py_dev_deps
 
-deps: py_dev_deps
+py_deploy_deps: $(BUILD_DIR)/pip-deploy.log
+
+$(BUILD_DIR)/pip-deploy.log: requirements.txt
+	@mkdir -p $(BUILD_DIR)
+	$(PIP) install -Ur $< && touch $@
 
 py_dev_deps: $(BUILD_DIR)/pip-dev.log
 
-$(BUILD_DIR)/pip-dev.log: requirements.txt
-	@mkdir -p .build
-	$(PIP) install -Ur requirements.txt | tee $(BUILD_DIR)/pip-dev.log
+$(BUILD_DIR)/pip-dev.log: requirements_dev.txt
+	@mkdir -p $(BUILD_DIR)
+	$(PIP) install -Ur $< && touch $@
 
 unit: clean
-	nosetests --with-coverage -A 'not integration'
+	nosetests --with-coverage --cover-package=karld -A 'not integration'
 
 integrations:
-	nosetests --logging-level=ERROR -A 'integration'
+	nosetests --with-coverage --cover-package=karld --logging-level=ERROR -A 'integration'
+
+testall: clean
+	nosetests --with-coverage --cover-package=karld
 
 test: clean unit integrations

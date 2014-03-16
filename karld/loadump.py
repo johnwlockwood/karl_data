@@ -1,12 +1,25 @@
 from __future__ import print_function
+
 import csv
-from functools import partial
-from itertools import takewhile
-import json
 import os
+import json
+
+from functools import partial
+
+from itertools import chain
+from itertools import imap
+from itertools import takewhile
+from itertools import repeat
+from itertools import starmap
+
+from operator import itemgetter
+from operator import is_not
+
 from itertools_recipes import grouper
 
 LINE_BUFFER_SIZE = 5000
+WALK_SUB_DIR = 0
+WALK_FILES = 2
 
 
 def ensure_dir(directory):
@@ -20,13 +33,13 @@ def ensure_dir(directory):
         os.makedirs(directory)
 
 
-def is_not(a, b):
+def ensure_file_path_dir(file_path):
     """
-    logical function to identify if a and b are not the same.
-    :param a: any value
-    :param b: any value
+    Ensure the parent directory of the file path.
+
+    :param file_path: :class: `str` path to file.
     """
-    return a is not b
+    ensure_dir(os.path.abspath(os.path.dirname(file_path)))
 
 
 def i_get_csv_data(file_name, *args, **kwargs):
@@ -66,12 +79,22 @@ def write_as_csv(items, file_name, append=False, line_buffer_size=None):
                 takewhile(is_not_fill, line_group))
 
 
+def is_file_csv(file_path_name):
+    """
+    Is the file a csv file? Identify by extension.
+
+    :param file_path_name:
+    """
+    _, file_name = file_path_name
+    return file_name[-4:].lower() == '.csv'
+
+
 def dump_dicts_to_json_file(file_name, dicts):
     """writes each dictionary in the dicts iterable
     to a line of the file as json."""
     with open(file_name, 'w+') as json_file:
         for item in dicts:
-            json_file.write(json.dumps(item)+"\n")
+            json_file.write(json.dumps(item) + "\n")
 
 
 def split_file_output_json(filename, dict_list, max_lines=1100):
@@ -142,12 +165,40 @@ def split_file(file_path, out_dir=None, max_lines=200000):
         # input file.
         out_dir = dir_name
     else:
-        if not os.path.exists(out_dir):
-            os.makedirs(out_dir)
+        ensure_dir(out_dir)
 
     with open(file_path, 'r') as data_file:
         data = (line for line in data_file)
         split_file_output(base_name, data, out_dir, max_lines=max_lines)
+
+
+def file_path_and_name(path, base_name):
+    """
+    Join the path and base_name and yield it and the base_name.
+
+    :param path: `str` directory path
+    :param base_name: `str` file name
+
+    :return: `tuple` of file path and file name.
+    """
+    return os.path.join(path, base_name), base_name
+
+
+def i_walk_dir_for_paths_names(root_dir):
+    """
+    Walks a directory yielding the directory of files
+    and names of files.
+
+    :param root_dir: path to a directory.
+    :type root_dir: `str`
+    """
+    return chain.from_iterable(
+        (
+            imap(None, repeat(subdir), files)
+            for subdir, files
+            in imap(itemgetter(WALK_SUB_DIR, WALK_FILES), os.walk(root_dir))
+        )
+    )
 
 
 def i_walk_dir_for_filepaths_names(root_dir):
@@ -155,8 +206,8 @@ def i_walk_dir_for_filepaths_names(root_dir):
     Walks a directory yielding the paths and names
     of files.
 
-    :param root_dir: :class: `str` path to a directory.
+    :param root_dir: path to a directory.
+    :type root_dir: `str`
     """
-    for subdir, dirs, files in os.walk(root_dir):
-        for fi in files:
-            yield os.path.join(subdir, fi), fi
+    return starmap(file_path_and_name,
+                   i_walk_dir_for_paths_names(root_dir))

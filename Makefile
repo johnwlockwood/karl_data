@@ -26,12 +26,12 @@ $(BUILD_DIR)/pip-dev.log: requirements_dev.txt
 	$(PIP) install -Ur $< && touch $@
 
 unit: clean
-	nosetests --with-coverage --cover-package=karld -A 'not integration'
+	nosetests --with-coverage -A 'not integration'
 
 integrations:
-	nosetests --with-coverage --cover-package=karld --logging-level=ERROR -A 'integration'
+	nosetests --with-coverage --logging-level=ERROR -A 'integration'
 
 testall: clean
-	nosetests --with-coverage --cover-package=karld
+	nosetests --with-coverage
 
 test: clean unit integrations

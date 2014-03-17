@@ -12,6 +12,8 @@ Contents:
    :maxdepth: 2
 
    getting-started
+   source/karld
+   source/karld.tests
 
 Indices and tables
 ==================

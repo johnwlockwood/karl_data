@@ -45,7 +45,7 @@ def ensure_file_path_dir(file_path):
 def i_get_csv_data(file_name, *args, **kwargs):
     """A generator for reading a csv file.
     """
-    with open(file_name, 'r') as csv_file:
+    with open(file_name, 'rb') as csv_file:
         reader = csv.reader(csv_file, *args, **kwargs)
         for row in reader:
             yield row
@@ -65,9 +65,9 @@ def write_as_csv(items, file_name, append=False, line_buffer_size=None):
     if line_buffer_size is None:
         line_buffer_size = LINE_BUFFER_SIZE
     if append:
-        mode = 'a'
+        mode = 'ab'
     else:
-        mode = 'wt'
+        mode = 'wtb'
     with open(file_name, mode) as csv_file:
         writer = csv.writer(csv_file)
         line_groups = grouper(line_buffer_size,

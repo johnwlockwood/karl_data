@@ -1,2 +1,2 @@
-itertools-recipes
+itertools-recipes==0.1
 futures==2.1.6

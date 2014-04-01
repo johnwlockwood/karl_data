@@ -18,7 +18,8 @@ def yield_nth_of(nth, iterator):
     For an iterator that returns sequences,
     yield the nth value of each.
 
-    :param nth: :class: `int` index desired column of each sequence.
+    :param nth: Index desired column of each sequence.
+    :type nth: int
     :param iterator: iterator of sequences.
     """
     return yield_getter_of(partial(itemgetter, nth), iterator)

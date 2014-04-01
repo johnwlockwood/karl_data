@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import csv
 import os
 import json
@@ -27,7 +25,7 @@ def ensure_dir(directory):
     If directory doesn't exist, make it.
 
     :param directory: path to directory
-    :type directory: `str`
+    :type directory: str
     """
     if not os.path.exists(directory):
         os.makedirs(directory)
@@ -37,7 +35,8 @@ def ensure_file_path_dir(file_path):
     """
     Ensure the parent directory of the file path.
 
-    :param file_path: :class: `str` path to file.
+    :param file_path: Path to file.
+    :type file_path: str
     """
     ensure_dir(os.path.abspath(os.path.dirname(file_path)))
 
@@ -84,6 +83,7 @@ def is_file_csv(file_path_name):
     Is the file a csv file? Identify by extension.
 
     :param file_path_name:
+    :type file_path_name: str
     """
     _, file_name = file_path_name
     return file_name[-4:].lower() == '.csv'
@@ -136,9 +136,13 @@ def split_file_output(name, data, out_dir, max_lines=1100):
     Split an iterable lines into groups and write each to
     a shard.
     :param name: Each shard will use this in it's name.
-    :param data: `iterable` of data to write.
+    :type name: str
+    :param data: Iterable of data to write.
+    :type data: iter
     :param out_dir: Path to directory to write the shards.
+    :type out_dir: str
     :param max_lines: Max number of lines per shard.
+    :type max_lines: int
     """
     fill_object = object()
     groups = grouper(max_lines, data, fillvalue=fill_object)
@@ -152,9 +156,12 @@ def split_file_output(name, data, out_dir, max_lines=1100):
 def split_file(file_path, out_dir=None, max_lines=200000):
     """
     Opens then shards the file.
-    :param file_path: `str` Path to the large input file.
-    :param max_lines: `int` Max number of lines in each shard.
-    :param out_dir: `str` Path of directory to put the shards.
+    :param file_path: Path to the large input file.
+    :type file_path: str
+    :param max_lines: Max number of lines in each shard.
+    :type max_lines: int
+    :param out_dir: Path of directory to put the shards.
+    :type out_dir: str
     """
     dir_name = os.path.abspath(os.path.dirname(file_path))
 
@@ -176,8 +183,10 @@ def file_path_and_name(path, base_name):
     """
     Join the path and base_name and yield it and the base_name.
 
-    :param path: `str` directory path
-    :param base_name: `str` file name
+    :param path: Directory path
+    :type path: str
+    :param base_name: File name
+    :type base_name: str
 
     :return: `tuple` of file path and file name.
     """
@@ -190,7 +199,7 @@ def i_walk_dir_for_paths_names(root_dir):
     and names of files.
 
     :param root_dir: path to a directory.
-    :type root_dir: `str`
+    :type root_dir: str
     """
     return chain.from_iterable(
         (
@@ -207,7 +216,7 @@ def i_walk_dir_for_filepaths_names(root_dir):
     of files.
 
     :param root_dir: path to a directory.
-    :type root_dir: `str`
+    :type root_dir: str
     """
     return starmap(file_path_and_name,
                    i_walk_dir_for_paths_names(root_dir))

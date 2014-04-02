@@ -1,1 +1,4 @@
 include *.md
+include requirements*.txt
+include LICENSE
+recursive-include docs *.rst *.py Makefile make.bat

@@ -2,18 +2,15 @@ import csv
 import os
 import json
 
-from functools import partial
-
 from itertools import chain
+from itertools import count
 from itertools import imap
-from itertools import takewhile
 from itertools import repeat
 from itertools import starmap
 
 from operator import itemgetter
-from operator import is_not
 
-from itertools_recipes import grouper
+from karld.iter_utils import i_batch
 
 LINE_BUFFER_SIZE = 5000
 WALK_SUB_DIR = 0
@@ -59,8 +56,6 @@ def write_as_csv(items, file_name, append=False, line_buffer_size=None):
     :param append: whether to append or overwrite the file.
     :param line_buffer_size: number of lines to write at a time.
     """
-    fill_object = object()
-    is_not_fill = partial(is_not, fill_object)
     if line_buffer_size is None:
         line_buffer_size = LINE_BUFFER_SIZE
     if append:
@@ -69,13 +64,9 @@ def write_as_csv(items, file_name, append=False, line_buffer_size=None):
         mode = 'wt'
     with open(file_name, mode) as csv_file:
         writer = csv.writer(csv_file)
-        line_groups = grouper(line_buffer_size,
-                              items,
-                              fillvalue=fill_object)
-
-        for line_group in line_groups:
-            writer.writerows(
-                takewhile(is_not_fill, line_group))
+        batches = i_batch(line_buffer_size, items)
+        for batch in batches:
+            writer.writerows(batch)
 
 
 def is_file_csv(file_path_name):
@@ -102,15 +93,16 @@ def split_file_output_json(filename, dict_list, max_lines=1100):
     Split an iterable of JSON serializable rows of data
      into groups and write each to a shard.
     """
-    fill_object = object()
-    groups = grouper(max_lines, dict_list, fillvalue=fill_object)
     dirname = os.path.dirname(filename)
     basename = os.path.basename(filename)
-    for index, group in enumerate(groups):
-        dict_group = takewhile(lambda x: x is not fill_object, group)
+
+    batches = i_batch(max_lines, dict_list)
+
+    index = count()
+    for group in batches:
         dump_dicts_to_json_file(
-            os.path.join(dirname, "{0}_{1}".format(index, basename)),
-            dict_group)
+            os.path.join(dirname, "{0}_{1}".format(next(index), basename)),
+            group)
 
 
 def split_file_output_csv(filename, data, max_lines=1100, out_dir=None):
@@ -118,17 +110,19 @@ def split_file_output_csv(filename, data, max_lines=1100, out_dir=None):
     Split an iterable of csv serializable rows of data
      into groups and write each to a csv shard.
     """
-    fill_object = object()
-    groups = grouper(max_lines, data, fillvalue=fill_object)
+    batches = i_batch(max_lines, data)
+
     dirname = os.path.abspath(os.path.dirname(filename))
     if out_dir is None:
         out_dir = dirname
     basename = os.path.basename(filename)
-    for index, group in enumerate(groups):
-        dict_group = takewhile(lambda x: x is not fill_object, group)
+
+    index = count()
+    for group in batches:
         write_as_csv(
-            dict_group,
-            os.path.join(out_dir, "{0}_{1}".format(index, basename)))
+            group,
+            os.path.join(out_dir, "{0}_{1}".format(next(index), basename))
+        )
 
 
 def split_file_output(name, data, out_dir, max_lines=1100):
@@ -144,13 +138,14 @@ def split_file_output(name, data, out_dir, max_lines=1100):
     :param max_lines: Max number of lines per shard.
     :type max_lines: int
     """
-    fill_object = object()
-    groups = grouper(max_lines, data, fillvalue=fill_object)
-    for index, group in enumerate(groups):
-        lines = takewhile(lambda x: x is not fill_object, group)
-        with open(os.path.join(out_dir, "{0}_{1}".format(
-                index, name)), 'wt') as shard_file:
-            shard_file.write("".join(lines))
+    batches = i_batch(max_lines, data)
+
+    index = count()
+    for group in batches:
+        file_path = os.path.join(out_dir,
+                                 "{0}_{1}".format(next(index), name))
+        with open(file_path, 'wt') as shard_file:
+            shard_file.write("".join(group))
 
 
 def split_file(file_path, out_dir=None, max_lines=200000):

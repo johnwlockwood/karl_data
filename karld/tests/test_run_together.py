@@ -1,6 +1,6 @@
+from itertools import islice
 import string
 import unittest
-from itertools_recipes import take
 from mock import patch, Mock
 
 from ..run_together import csv_file_to_file
@@ -30,7 +30,7 @@ class TestCSVFileToFile(unittest.TestCase):
 
         """
         def out_csv(rows, out_file):
-            return take(3, rows)
+            return list(islice(rows, 3))
 
         mock_out_csv.side_effect = out_csv
         mock_in_csv.return_value = self.csv_contents

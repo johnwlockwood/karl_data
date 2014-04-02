@@ -42,7 +42,8 @@ def ensure_file_path_dir(file_path):
 def i_get_csv_data(file_name, *args, **kwargs):
     """A generator for reading a csv file.
     """
-    with open(file_name, 'rb') as csv_file:
+    buffering = kwargs.get('buffering', FILE_BUFFER_SIZE)
+    with open(file_name, 'rb', buffering=buffering) as csv_file:
         reader = csv.reader(csv_file, *args, **kwargs)
         for row in reader:
             yield row

@@ -1,10 +1,7 @@
 from functools import partial
 from itertools import imap
 from itertools import islice
-from itertools import izip_longest
-from itertools import ifilter
 from operator import itemgetter
-from operator import is_not
 
 
 def yield_getter_of(getter_maker, iterator):
@@ -27,27 +24,6 @@ def yield_nth_of(nth, iterator):
     :param iterator: iterator of sequences.
     """
     return yield_getter_of(partial(itemgetter, nth), iterator)
-
-
-def grouper(iterable, n, fillvalue=None):
-    "Collect data into fixed-length chunks or blocks"
-    # grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx
-    args = [iter(iterable)] * n
-    return izip_longest(fillvalue=fillvalue, *args)
-
-
-fo = object()
-is_not_fo = partial(is_not, fo)
-
-
-def batcher(n, iterable):
-    for batch in grouper(iterable, n, fillvalue=fo):
-        yield filter(is_not_fo, batch)
-
-
-def i_batcher(n, iterable):
-    for batch in grouper(iterable, n, fillvalue=fo):
-        yield ifilter(is_not_fo, batch)
 
 
 def i_batch(max_size, iterable):

@@ -13,6 +13,7 @@ from operator import itemgetter
 from karld.iter_utils import i_batch
 
 LINE_BUFFER_SIZE = 5000
+FILE_BUFFER_SIZE = 10485760  # -1  # 419430400
 WALK_SUB_DIR = 0
 WALK_FILES = 2
 
@@ -41,13 +42,15 @@ def ensure_file_path_dir(file_path):
 def i_get_csv_data(file_name, *args, **kwargs):
     """A generator for reading a csv file.
     """
-    with open(file_name, 'rb') as csv_file:
+    buffering = kwargs.get('buffering', FILE_BUFFER_SIZE)
+    with open(file_name, 'rb', buffering=buffering) as csv_file:
         reader = csv.reader(csv_file, *args, **kwargs)
         for row in reader:
             yield row
 
 
-def write_as_csv(items, file_name, append=False, line_buffer_size=None):
+def write_as_csv(items, file_name, append=False,
+                 line_buffer_size=None, buffering=FILE_BUFFER_SIZE):
     """
     Writes out items to a csv file in groups.
 
@@ -55,6 +58,8 @@ def write_as_csv(items, file_name, append=False, line_buffer_size=None):
     :param file_name: path to the output file.
     :param append: whether to append or overwrite the file.
     :param line_buffer_size: number of lines to write at a time.
+    :param buffering: number of bytes to buffer files
+    :type buffering: int
     """
     if line_buffer_size is None:
         line_buffer_size = LINE_BUFFER_SIZE
@@ -62,7 +67,7 @@ def write_as_csv(items, file_name, append=False, line_buffer_size=None):
         mode = 'ab'
     else:
         mode = 'wtb'
-    with open(file_name, mode) as csv_file:
+    with open(file_name, mode, buffering=buffering) as csv_file:
         writer = csv.writer(csv_file)
         batches = i_batch(line_buffer_size, items)
         for batch in batches:
@@ -80,18 +85,26 @@ def is_file_csv(file_path_name):
     return file_name[-4:].lower() == '.csv'
 
 
-def dump_dicts_to_json_file(file_name, dicts):
+def dump_dicts_to_json_file(file_name, dicts, buffering=FILE_BUFFER_SIZE):
     """writes each dictionary in the dicts iterable
-    to a line of the file as json."""
-    with open(file_name, 'w+') as json_file:
+    to a line of the file as json.
+
+    :param buffering: number of bytes to buffer files
+    :type buffering: int
+    """
+    with open(file_name, 'w+', buffering=buffering) as json_file:
         for item in dicts:
             json_file.write(json.dumps(item) + "\n")
 
 
-def split_file_output_json(filename, dict_list, max_lines=1100):
+def split_file_output_json(filename, dict_list, max_lines=1100,
+                           buffering=FILE_BUFFER_SIZE):
     """
     Split an iterable of JSON serializable rows of data
      into groups and write each to a shard.
+
+    :param buffering: number of bytes to buffer files
+    :type buffering: int
     """
     dirname = os.path.dirname(filename)
     basename = os.path.basename(filename)
@@ -102,13 +115,18 @@ def split_file_output_json(filename, dict_list, max_lines=1100):
     for group in batches:
         dump_dicts_to_json_file(
             os.path.join(dirname, "{0}_{1}".format(next(index), basename)),
-            group)
+            group,
+            buffering=buffering)
 
 
-def split_file_output_csv(filename, data, max_lines=1100, out_dir=None):
+def split_file_output_csv(filename, data, max_lines=1100, out_dir=None,
+                          buffering=FILE_BUFFER_SIZE):
     """
     Split an iterable of csv serializable rows of data
      into groups and write each to a csv shard.
+
+    :param buffering: number of bytes to buffer files
+    :type buffering: int
     """
     batches = i_batch(max_lines, data)
 
@@ -121,11 +139,13 @@ def split_file_output_csv(filename, data, max_lines=1100, out_dir=None):
     for group in batches:
         write_as_csv(
             group,
-            os.path.join(out_dir, "{0}_{1}".format(next(index), basename))
+            os.path.join(out_dir, "{0}_{1}".format(next(index), basename)),
+            buffering=buffering
         )
 
 
-def split_file_output(name, data, out_dir, max_lines=1100):
+def split_file_output(name, data, out_dir, max_lines=1100,
+                      buffering=FILE_BUFFER_SIZE):
     """
     Split an iterable lines into groups and write each to
     a shard.
@@ -137,6 +157,8 @@ def split_file_output(name, data, out_dir, max_lines=1100):
     :type out_dir: str
     :param max_lines: Max number of lines per shard.
     :type max_lines: int
+    :param buffering: number of bytes to buffer files
+    :type buffering: int
     """
     batches = i_batch(max_lines, data)
 
@@ -144,11 +166,12 @@ def split_file_output(name, data, out_dir, max_lines=1100):
     for group in batches:
         file_path = os.path.join(out_dir,
                                  "{0}_{1}".format(next(index), name))
-        with open(file_path, 'wt') as shard_file:
+        with open(file_path, 'wt', buffering=buffering) as shard_file:
             shard_file.write("".join(group))
 
 
-def split_file(file_path, out_dir=None, max_lines=200000):
+def split_file(file_path, out_dir=None, max_lines=200000,
+               buffering=FILE_BUFFER_SIZE):
     """
     Opens then shards the file.
     :param file_path: Path to the large input file.
@@ -157,6 +180,8 @@ def split_file(file_path, out_dir=None, max_lines=200000):
     :type max_lines: int
     :param out_dir: Path of directory to put the shards.
     :type out_dir: str
+    :param buffering: number of bytes to buffer files
+    :type buffering: int
     """
     dir_name = os.path.abspath(os.path.dirname(file_path))
 
@@ -169,9 +194,10 @@ def split_file(file_path, out_dir=None, max_lines=200000):
     else:
         ensure_dir(out_dir)
 
-    with open(file_path, 'r') as data_file:
+    with open(file_path, 'r', buffering=buffering) as data_file:
         data = (line for line in data_file)
-        split_file_output(base_name, data, out_dir, max_lines=max_lines)
+        split_file_output(base_name, data, out_dir, max_lines=max_lines,
+                          buffering=buffering)
 
 
 def file_path_and_name(path, base_name):

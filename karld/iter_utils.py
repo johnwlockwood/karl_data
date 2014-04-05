@@ -40,12 +40,12 @@ fo = object()
 is_not_fo = partial(is_not, fo)
 
 
-def batcher(iterable, n):
+def batcher(n, iterable):
     for batch in grouper(iterable, n, fillvalue=fo):
         yield filter(is_not_fo, batch)
 
 
-def i_batcher(iterable, n):
+def i_batcher(n, iterable):
     for batch in grouper(iterable, n, fillvalue=fo):
         yield ifilter(is_not_fo, batch)
 

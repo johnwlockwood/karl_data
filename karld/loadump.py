@@ -56,7 +56,7 @@ def write_as_csv(items, file_name, append=False,
 
     :param items: An iterable collection of collections.
     :param file_name: path to the output file.
-    :param append: whether to append or overwrit the file.
+    :param append: whether to append or overwrite the file.
     :param line_buffer_size: number of lines to write at a time.
     :param buffering: number of bytes to buffer files
     :type buffering: int
@@ -149,6 +149,7 @@ def split_file_output(name, data, out_dir, max_lines=1100,
     """
     Split an iterable lines into groups and write each to
     a shard.
+
     :param name: Each shard will use this in it's name.
     :type name: str
     :param data: Iterable of data to write.
@@ -174,6 +175,7 @@ def split_file(file_path, out_dir=None, max_lines=200000,
                buffering=FILE_BUFFER_SIZE):
     """
     Opens then shards the file.
+
     :param file_path: Path to the large input file.
     :type file_path: str
     :param max_lines: Max number of lines in each shard.

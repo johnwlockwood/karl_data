@@ -24,7 +24,7 @@ def csv_file_to_file(csv_rows_consumer, out_prefix, out_dir, file_path_name):
     :param out_dir: directory to write output file to
     :type out_dir: str
     :param file_path_name: path to input csv file
-    :type file_path_name: str
+    :type file_path_name: str, str
 
     """
     data_path, data_file_name = file_path_name
@@ -72,7 +72,7 @@ def csv_files_to_file(csv_rows_consumer,
     :param out_file_name: Output file base name.
     :type out_file_name: str
     :param file_path_names: tuple of paths and basenames to input csv files
-    :type file_path_names: tuple
+    :type file_path_names: str, str
     """
     ensure_dir(out_dir)
     out_filename = os.path.join(

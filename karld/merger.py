@@ -11,7 +11,7 @@ import heapq
 def merge(*iterables, **kwargs):
     """Merge multiple sorted inputs into a single sorted output.
 
-   Similar to sorted(itertools.chain(*iterables)) but returns a generator,
+   Similar to sorted(itertools.chain(\*iterables)) but returns a generator,
    does not pull the data into memory all at once, and assumes that each of
    the input streams is already sorted (smallest to largest).
 

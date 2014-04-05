@@ -40,7 +40,8 @@ def join_stripped_gotten_value(sep, getters, data):
     from entity, gotten with collection of getters,
     with the separator.
 
-    :param sep: :class: `str` Separator of values.
+    :param sep: Separator of values.
+    :type sep: str
     :param getters: collection of callables takes that data and returns value.
     :param data: argument for the getters
     """
@@ -58,7 +59,8 @@ def join_stripped_values(sep, collection_getter, data):
     from entity, gotten with collection_getter,
     with the separator.
 
-    :param sep: :class: `str` Separator of values.
+    :param sep: Separator of values.
+    :type sep: str
     :param collection_getter: callable takes that data and returns collection.
     :param data: argument for the collection_getter
     """

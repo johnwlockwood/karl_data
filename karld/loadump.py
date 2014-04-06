@@ -149,6 +149,7 @@ def split_file_output(name, data, out_dir, max_lines=1100,
     """
     Split an iterable lines into groups and write each to
     a shard.
+
     :param name: Each shard will use this in it's name.
     :type name: str
     :param data: Iterable of data to write.
@@ -174,6 +175,7 @@ def split_file(file_path, out_dir=None, max_lines=200000,
                buffering=FILE_BUFFER_SIZE):
     """
     Opens then shards the file.
+
     :param file_path: Path to the large input file.
     :type file_path: str
     :param max_lines: Max number of lines in each shard.

@@ -38,9 +38,6 @@ def i_batch(max_size, iterable):
     :type iterable: iter
     """
     iterable_items = iter(iterable)
-
-    while True:
-        items_batch = tuple(islice(iterable_items, max_size))
-        if not items_batch:
-            break
+    for items_batch in iter(lambda: tuple(islice(iterable_items, max_size)),
+                            tuple()):
         yield items_batch

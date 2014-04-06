@@ -161,7 +161,7 @@ def get_unicode_row_writer(stream, dialect=csv.excel, encoding="utf-8", **kwargs
         unicode_row_writer = get_unicode_row_writer(myfile)
         for row in my_row_data:
             unicode_row_writer(row)
-    
+
     """
     queue = cStringIO.StringIO()
     writer = csv.writer(queue, dialect=dialect, **kwargs)

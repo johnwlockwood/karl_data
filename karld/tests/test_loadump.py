@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from datetime import datetime
 from itertools import ifilter
 from operator import itemgetter
@@ -13,6 +14,7 @@ from karld.loadump import i_walk_dir_for_filepaths_names
 from karld.loadump import is_file_csv
 from karld.merger import sort_merge_group
 from karld.run_together import csv_files_to_file
+from karld.unicode_io import map_decode_utf8_to_unicode
 
 
 class TestDirectoryFunctions(unittest.TestCase):
@@ -154,16 +156,19 @@ class TestFileSystemIntegration(unittest.TestCase):
         with open(expected_file) as result_file:
             contents = result_file.read()
             self.assertEqual(
-                ['cat, animal',
-                 'cheese, dairy',
-                 'apple, fruit',
-                 'orange, fruit',
-                 'peach, fruit',
-                 'pear, fruit',
-                 'tomato, fruit',
-                 'mushroom, fungus',
-                 'iron, metal',
-                 'titanium, metal',
-                 'ruby, mineral',
-                 'topaz, mineral',
-                 'celery, vegetable'], contents.splitlines())
+                ['cat,animal',
+                 'cheese,dairy',
+                 'apple,fruit',
+                 'orange,fruit',
+                 'peach,fruit',
+                 'pear,fruit',
+                 'tomato,fruit',
+                 'mushroom,fungus',
+                 'iron,metal',
+                 'titanium,metal',
+                 'ruby,mineral',
+                 'topaz,mineral',
+                 'WĄŻ,utf-8 sample',
+                 'dróżką,utf-8 sample',
+                 'celery,vegetable'],
+                contents.splitlines())

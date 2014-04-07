@@ -98,14 +98,14 @@ def unicode_csv_reader(unicode_csv_data, dialect=csv.excel, **kwargs):
     return imap(map_decode_utf8_to_unicode, reader)
 
 
-def utf8_iter_recoder(fi, encoding):
+def utf8_iter_recoder(stream, encoding):
     """Generator re-encodes input file's lines from a given
     encoding to utf-8.
 
     :param fi: file handle.
     :param encoding: str of encoding.
     """
-    return codecs.iterencode(codecs.iterdecode(fi, encoding), "utf-8")
+    return codecs.iterencode(codecs.iterdecode(stream, encoding), "utf-8")
 
 
 def unicode_reader(csv_data, dialect=csv.excel, encoding="utf-8", **kwargs):

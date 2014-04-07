@@ -1,4 +1,3 @@
-import csv
 import os
 import json
 
@@ -11,6 +10,8 @@ from itertools import starmap
 from operator import itemgetter
 
 from karld.iter_utils import i_batch
+from karld.unicode_io import csv_to_unicode_reader
+from karld.unicode_io import get_unicode_row_writer
 
 LINE_BUFFER_SIZE = 5000
 FILE_BUFFER_SIZE = 10485760  # -1  # 419430400
@@ -44,7 +45,7 @@ def i_get_csv_data(file_name, *args, **kwargs):
     """
     buffering = kwargs.get('buffering', FILE_BUFFER_SIZE)
     with open(file_name, 'rb', buffering=buffering) as csv_file:
-        reader = csv.reader(csv_file, *args, **kwargs)
+        reader = csv_to_unicode_reader(csv_file, *args, **kwargs)
         for row in reader:
             yield row
 
@@ -68,10 +69,11 @@ def write_as_csv(items, file_name, append=False,
     else:
         mode = 'wtb'
     with open(file_name, mode, buffering=buffering) as csv_file:
-        writer = csv.writer(csv_file)
+        unicode_row_writer = get_unicode_row_writer(csv_file)
         batches = i_batch(line_buffer_size, items)
         for batch in batches:
-            writer.writerows(batch)
+            for row in batch:
+                unicode_row_writer(row)
 
 
 def is_file_csv(file_path_name):

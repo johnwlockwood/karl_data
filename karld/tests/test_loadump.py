@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from datetime import datetime
 from itertools import ifilter
 from operator import itemgetter
@@ -154,16 +155,19 @@ class TestFileSystemIntegration(unittest.TestCase):
         with open(expected_file) as result_file:
             contents = result_file.read()
             self.assertEqual(
-                ['cat, animal',
-                 'cheese, dairy',
-                 'apple, fruit',
-                 'orange, fruit',
-                 'peach, fruit',
-                 'pear, fruit',
-                 'tomato, fruit',
-                 'mushroom, fungus',
-                 'iron, metal',
-                 'titanium, metal',
-                 'ruby, mineral',
-                 'topaz, mineral',
-                 'celery, vegetable'], contents.splitlines())
+                ['cat,animal',
+                 'cheese,dairy',
+                 'apple,fruit',
+                 'orange,fruit',
+                 'peach,fruit',
+                 'pear,fruit',
+                 'tomato,fruit',
+                 'mushroom,fungus',
+                 'iron,metal',
+                 'titanium,metal',
+                 'ruby,mineral',
+                 'topaz,mineral',
+                 'WĄŻ,utf-8 sample',
+                 'dróżką,utf-8 sample',
+                 'celery,vegetable'],
+                contents.splitlines())

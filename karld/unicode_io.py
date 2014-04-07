@@ -67,9 +67,9 @@ decoded from utf-8 to unicode.
 
 The python 2.7 csv module doesn't work with unicode,
 so the text it parses must be encoded from unicode
- to a str using an encoding that will handle all the
- chars in the text. utf-8 is good choice, and thus is
- default.
+to a str using an encoding that will handle all the
+chars in the text. utf-8 is good choice, and thus is
+default.
 
 The purpose of this module is to facilitate reading
 and writing csv data in whatever encoding your data

@@ -1,8 +1,12 @@
+from functools import partial
 from itertools import islice
+from operator import methodcaller
 import unittest
 import types
 
 from karld.iter_utils import i_batch
+from karld.iter_utils import yield_getter_of
+from karld.iter_utils import yield_nth_of
 
 
 class TestIBatch(unittest.TestCase):
@@ -78,3 +82,25 @@ class TestIBatch(unittest.TestCase):
         v1 = next(batches)
         self.assertEqual((0, 1, 2, 3, 4, 5), v1)
         self.assertEqual((6, 7, 8, 9), tuple(self.iterable_items))
+
+
+class TestYielders(unittest.TestCase):
+    def test_yield_getter_of(self):
+        """
+        Ensure yield_getter_of with return a generator
+         of the values of an iterator as gotten with
+         a getter.
+        """
+        data = iter(("hello", "world"))
+        upper_generator = yield_getter_of(partial(methodcaller, 'upper'),
+                                          data)
+        self.assertEqual(("HELLO", "WORLD"), tuple(upper_generator))
+
+    def test_yield_nth_of(self):
+        """
+        Ensure yield_nth_of will return a generator of
+         the nth values of each item of an iterator.
+        """
+        data = iter((("hello", "world"),
+                    ("alice", "pin")))
+        self.assertEqual(("world", "pin"), tuple(yield_nth_of(1, data)))

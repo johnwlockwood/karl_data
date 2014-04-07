@@ -133,6 +133,16 @@ def csv_to_unicode_reader(csv_data,
     return imap(map_decode_utf8_to_unicode, reader)
 
 
+def _encode_unicode_or_identity(value):
+    """
+    Encode a value to utf-8 only if
+    it's unicode.
+    """
+    if isinstance(value, unicode):
+        return encode_utf8(value)
+    return value
+
+
 def _encode_write_row(stream, queue, writer, encoder, row):
     """
     Write a row, of unicode data to a cStringIO.StringIO
@@ -141,7 +151,7 @@ def _encode_write_row(stream, queue, writer, encoder, row):
     encoding and write to the stream.
 
     """
-    writer.writerow(map(encode_utf8, row))
+    writer.writerow(map(_encode_unicode_or_identity, row))
     stream.write(
         encoder.encode(
             decode_utf8(

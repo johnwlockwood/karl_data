@@ -49,7 +49,7 @@ def join_stripped_gotten_value(sep, getters, data):
         filter(
             None,
             imap(string.strip,
-                 imap(str,
+                 imap(unicode,
                       filter(None, [getter(data) for getter in getters])))))
 
 
@@ -68,4 +68,4 @@ def join_stripped_values(sep, collection_getter, data):
         filter(
             None,
             imap(string.strip,
-                 imap(str, filter(None, collection_getter(data))))))
+                 imap(unicode, filter(None, collection_getter(data))))))

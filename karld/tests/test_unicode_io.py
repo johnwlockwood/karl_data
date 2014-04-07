@@ -92,7 +92,7 @@ class TestUnicodeCSVRowWriter(unittest.TestCase):
 
     def setUp(self):
         self.data = [
-            [u"WĄŻ", u"utf-8 sample"],
+            [u"WĄŻ", 2, u"utf-8 sample"],
             [u"dróżką", u"utf-8 sample"]
         ]
 
@@ -108,5 +108,5 @@ class TestUnicodeCSVRowWriter(unittest.TestCase):
         for row in self.data:
             unicode_row_writer(row)
 
-        self.assertEqual("WĄŻ,utf-8 sample\r\ndróżką,utf-8 sample\r\n",
+        self.assertEqual("WĄŻ,2,utf-8 sample\r\ndróżką,utf-8 sample\r\n",
                          self.file_stream.getvalue())

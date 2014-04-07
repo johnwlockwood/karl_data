@@ -25,3 +25,11 @@ tests Package
     :undoc-members:
     :show-inheritance:
 
+:mod:`test_unicode_io` Module
+-------------------------------
+
+.. automodule:: karld.tests.test_unicode_io
+    :members:
+    :undoc-members:
+    :show-inheritance:
+

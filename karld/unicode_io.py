@@ -11,13 +11,15 @@ from operator import methodcaller
 
 __doc__ = """
 Unfortunately, as you probably already know, encoding.
-==============
+======================================================
 
 Y U NO LIKE MY CHARACTERS?
 
 Not all encodings are like that.
 
-How to encoding: Unicode is supposed to handle
+How to encoding
+****************
+Unicode is supposed to handle
 a wider range of chars used by different languages
 around the world and also emojis and other symbols
 or curly quotes.
@@ -39,26 +41,25 @@ connected to the language or locale it was created in.
 Sometimes it can be inferred by the data. Many times
 it's written in utf-8, which can handle encoding all
 the different chars that can be in a unicode string.
-It does this by saving chars like '¥', or in unicode, u'\xa5',
- as '\xc2\xa5'.  u'\xa5'.encode('utf-8') results in '\xc2\xa5'.
- It uses more space, but can do it. By the way, '¥'
- is possible in this code because the encoding is declared
- at the top of this file.
+It does this by saving chars like ``'¥'``, or in unicode, ``u'\\xa5'``,
+as ``'\\xc2\\xa5'``.  ``u'\\xa5'.encode('utf-8')`` results in ``'\\xc2\\xa5'``.
+It uses more space, but can do it. By the way, ``'¥'``
+is possible in this code because the encoding is declared
+at the top of this file.
 
 Unicode is how python can deal with all the chars in
 memory, but when writing to a file, it has to encode
 it to a specific encoding.
 
 String transformation methods, such as upper() or lower()
- don't work on these chars, like 'î' or 'ê' if they are
- encoded as a utf-8 string, but will work if they are
- decoded from utf-8 to unicode.
+don't work on these chars, like 'î' or 'ê' if they are
+encoded as a utf-8 string, but will work if they are
+decoded from utf-8 to unicode.
 
 >>> print 'î'.upper()
 î
 >>> print u'î'.upper()
 Î
-
 >>> print 'ê'.upper()
 ê
 >>> print 'ê'.decode('utf-8').upper()
@@ -168,18 +169,20 @@ def get_unicode_row_writer(stream, dialect=csv.excel, encoding="utf-8", **kwargs
     Create a csv, encoding from unicode, row writer.
 
     Use returned callable to write rows of unicode data
-     to a stream, such as a file opened in write mode,
-     in utf-8(or another) encoding.
+    to a stream, such as a file opened in write mode,
+    in utf-8(or another) encoding.
 
-    my_row_data = [
-        [u'one', u'two'],
-        [u'three', u'four'],
-    ]
+    ::
 
-    with open('myfile.csv', 'wt') as myfile:
-        unicode_row_writer = get_unicode_row_writer(myfile)
-        for row in my_row_data:
-            unicode_row_writer(row)
+        my_row_data = [
+            [u'one', u'two'],
+            [u'three', u'four'],
+        ]
+
+        with open('myfile.csv', 'wt') as myfile:
+            unicode_row_writer = get_unicode_row_writer(myfile)
+            for row in my_row_data:
+                unicode_row_writer(row)
     """
     queue = cStringIO.StringIO()
     writer = csv.writer(queue, dialect=dialect, **kwargs)

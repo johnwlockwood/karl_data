@@ -14,7 +14,6 @@ from karld.loadump import i_walk_dir_for_filepaths_names
 from karld.loadump import is_file_csv
 from karld.merger import sort_merge_group
 from karld.run_together import csv_files_to_file
-from karld.unicode_io import map_decode_utf8_to_unicode
 
 
 class TestDirectoryFunctions(unittest.TestCase):

@@ -82,7 +82,7 @@ decode_utf8_to_unicode = partial(unicode, encoding="utf-8")
 map_decode_utf8_to_unicode = partial(map, decode_utf8_to_unicode)
 
 
-def unicode_csv_reader(unicode_csv_data, dialect=csv.excel, **kwargs):
+def unicode_csv_unicode_reader(unicode_csv_data, dialect=csv.excel, **kwargs):
     """
     Generator the reads a unicode csv data.
     Use this if you have a stream of data
@@ -90,6 +90,9 @@ def unicode_csv_reader(unicode_csv_data, dialect=csv.excel, **kwargs):
     of the data as sequences encoded as unicode.
 
     Unicode in, unicode out.
+
+    :param unicode_csv_data: An iterable of unicode strings.
+    :param dialect: csv dialect
     """
     encoded_utf8_data = imap(encode_utf8, unicode_csv_data)
 
@@ -102,19 +105,25 @@ def utf8_iter_recoder(stream, encoding):
     """Generator re-encodes input file's lines from a given
     encoding to utf-8.
 
-    :param fi: file handle.
+    :param stream: file handle.
     :param encoding: str of encoding.
     """
     return codecs.iterencode(codecs.iterdecode(stream, encoding), "utf-8")
 
 
-def unicode_reader(csv_data, dialect=csv.excel, encoding="utf-8", **kwargs):
+def csv_to_unicode_reader(csv_data,
+                          dialect=csv.excel,
+                          encoding="utf-8", **kwargs):
     """
     Csv row generator that re-encodes to
     unicode from csv data with a given encoding.
 
     Utf-8 data in, unicode out. You may specify a different
      encoding of the incoming data.
+
+    :param csv_data: An iterable of str of the specified encoding.
+    :param dialect: csv dialect
+    :param encoding: The encoding of the given data.
     """
     reader = csv.reader(
         utf8_iter_recoder(csv_data, encoding),
@@ -161,7 +170,6 @@ def get_unicode_row_writer(stream, dialect=csv.excel, encoding="utf-8", **kwargs
         unicode_row_writer = get_unicode_row_writer(myfile)
         for row in my_row_data:
             unicode_row_writer(row)
-
     """
     queue = cStringIO.StringIO()
     writer = csv.writer(queue, dialect=dialect, **kwargs)

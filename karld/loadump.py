@@ -10,7 +10,7 @@ from itertools import starmap
 from operator import itemgetter
 
 from karld.iter_utils import i_batch
-from karld.unicode_io import unicode_reader
+from karld.unicode_io import csv_to_unicode_reader
 from karld.unicode_io import get_unicode_row_writer
 
 LINE_BUFFER_SIZE = 5000
@@ -45,7 +45,7 @@ def i_get_csv_data(file_name, *args, **kwargs):
     """
     buffering = kwargs.get('buffering', FILE_BUFFER_SIZE)
     with open(file_name, 'rb', buffering=buffering) as csv_file:
-        reader = unicode_reader(csv_file, *args, **kwargs)
+        reader = csv_to_unicode_reader(csv_file, *args, **kwargs)
         for row in reader:
             yield row
 

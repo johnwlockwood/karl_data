@@ -5,8 +5,8 @@ import unittest
 import cStringIO
 
 from karld.unicode_io import unicode_csv_unicode_reader
-from karld.unicode_io import csv_to_unicode_reader
-from karld.unicode_io import get_unicode_row_writer
+from karld.unicode_io import csv_reader
+from karld.unicode_io import get_csv_row_writer
 
 
 class TestUnicodeToUnicodeCSVReader(unittest.TestCase):
@@ -60,7 +60,7 @@ class TestCSVToUnicodeReader(unittest.TestCase):
         Ensure utf-8 strings in the data
         are converted to unicode sequences.
         """
-        rows = list(csv_to_unicode_reader(self.data))
+        rows = list(csv_reader(self.data))
 
         self.assertEqual(
             [
@@ -74,7 +74,7 @@ class TestCSVToUnicodeReader(unittest.TestCase):
         iteratively.
         """
         data = iter(self.data)
-        rows = csv_to_unicode_reader(data)
+        rows = csv_reader(data)
         first_row = next(rows)
         self.assertEqual([u"WĄŻ", u"utf-8 sample"],
                          first_row)
@@ -86,7 +86,7 @@ class TestCSVToUnicodeReader(unittest.TestCase):
 
 class TestUnicodeCSVRowWriter(unittest.TestCase):
     """
-    Ensure get_unicode_row_writer returns a function
+    Ensure get_csv_row_writer returns a function
     that will write a row of data to a stream.
     """
 
@@ -100,11 +100,11 @@ class TestUnicodeCSVRowWriter(unittest.TestCase):
 
     def test_write_unicode(self):
         """
-        Ensure the function returned from get_unicode_row_writer
+        Ensure the function returned from get_csv_row_writer
         will write a row to the io stream.
         """
 
-        unicode_row_writer = get_unicode_row_writer(self.file_stream)
+        unicode_row_writer = get_csv_row_writer(self.file_stream)
         for row in self.data:
             unicode_row_writer(row)
 

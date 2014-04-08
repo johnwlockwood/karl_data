@@ -2,7 +2,6 @@ from functools import partial
 from itertools import ifilter
 import os
 
-from concurrent.futures import ProcessPoolExecutor
 from karld.iter_utils import yield_nth_of
 
 from .loadump import ensure_dir
@@ -98,6 +97,7 @@ def pool_run_files_to_files(file_to_file, in_dir, filter_func=None):
     :param filter_func: Takes a tuple of path and base \
     name of a file and returns a bool.
     """
+    from concurrent.futures import ProcessPoolExecutor
     results = i_walk_dir_for_filepaths_names(in_dir)
     if filter_func:
         results_final = ifilter(filter_func, results)

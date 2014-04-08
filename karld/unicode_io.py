@@ -10,28 +10,27 @@ from operator import methodcaller
 #Unicode IO
 
 __doc__ = """
-Unfortunately, as you probably already know, encoding.
-======================================================
+How To Encoding
+=================
+If you've tried something like ``unicode('က')`` or  ``u'hello ' + 'wကrld'
+or ``str(u'wörld')`` you will have seen UnicodeDecodeError
+and UnicodeEncodeError. Likely, you've tried to
+read csv data from a file and mixed the data with unicode
+and everything went fine until it got to the line with
+some word with an accent character and it broke and showed
+``UnicodeDecodeError: 'ascii' codec can't decode byte ...``
+What do you do?.
+You've tried to write sequences of unicode strings
+to a csv file and gotten
+``UnicodeEncodeError: 'ascii' codec can't encode character u'\xf6' in position 1: ordinal not in range(128)``
+What do you do?
 
-Y U NO LIKE MY CHARACTERS?
-
-Not all encodings are like that.
-
-How to encoding
-****************
-Unicode is supposed to handle
-a wider range of chars used by different languages
-around the world and also emojis and other symbols
-or curly quotes.
-
-The texts in these different parts of the world
+Unicode handles characters used by different languages
+around the world, emojis, curly quotes and other *glyphs*.
+The textual data in different parts of the world
 can have various encodings designed to specifically
-handle their chars, but not others.
-
-Data will contain these chars. So reading them
-from the data as an encoding that does not account
-for them is when you get problems like UnicodeEncodeError
-or UnicodeDecodeError.
+handle their glyphs and unicode can represent them all,
+but the data must be decoded from that encoding to unicode.
 
 The data was written to the file in a specific encoding,
 either deliberately or because that was the default for
@@ -47,12 +46,8 @@ It uses more space, but can do it. By the way, ``'¥'``
 is possible in this code because the encoding is declared
 at the top of this file.
 
-Unicode is how python can deal with all the chars in
-memory, but when writing to a file, it has to encode
-it to a specific encoding.
-
 String transformation methods, such as upper() or lower()
-don't work on these chars, like 'î' or 'ê' if they are
+don't work on these chars, like ``'î'`` or ``'ê'`` if they are
 encoded as a utf-8 string, but will work if they are
 decoded from utf-8 to unicode.
 
@@ -75,7 +70,6 @@ The purpose of this module is to facilitate reading
 and writing csv data in whatever encoding your data
 is in.
 """
-
 
 encode_utf8 = methodcaller('encode', "utf-8")
 decode_utf8 = methodcaller('decode', "utf-8")
@@ -102,7 +96,7 @@ def unicode_csv_unicode_reader(unicode_csv_data, dialect=csv.excel, **kwargs):
     return imap(map_decode_utf8_to_unicode, reader)
 
 
-def utf8_iter_recoder(stream, encoding):
+def _utf8_iter_recoder(stream, encoding):
     """Generator re-encodes input file's lines from a given
     encoding to utf-8.
 
@@ -112,9 +106,7 @@ def utf8_iter_recoder(stream, encoding):
     return codecs.iterencode(codecs.iterdecode(stream, encoding), "utf-8")
 
 
-def csv_to_unicode_reader(csv_data,
-                          dialect=csv.excel,
-                          encoding="utf-8", **kwargs):
+def csv_reader(csv_data, dialect=csv.excel, encoding="utf-8", **kwargs):
     """
     Csv row generator that re-encodes to
     unicode from csv data with a given encoding.
@@ -127,11 +119,13 @@ def csv_to_unicode_reader(csv_data,
     :param encoding: The encoding of the given data.
     """
     reader = csv.reader(
-        utf8_iter_recoder(csv_data, encoding),
+        _utf8_iter_recoder(csv_data, encoding),
         dialect=dialect, **kwargs
     )
 
     return imap(map_decode_utf8_to_unicode, reader)
+
+csv_to_unicode_reader = csv_reader
 
 
 def _encode_unicode_or_identity(value):
@@ -164,7 +158,7 @@ def _encode_write_row(stream, queue, writer, encoder, row):
     queue.truncate(0)
 
 
-def get_unicode_row_writer(stream, dialect=csv.excel, encoding="utf-8", **kwargs):
+def get_csv_row_writer(stream, dialect=csv.excel, encoding="utf-8", **kwargs):
     """
     Create a csv, encoding from unicode, row writer.
 
@@ -188,3 +182,6 @@ def get_unicode_row_writer(stream, dialect=csv.excel, encoding="utf-8", **kwargs
     writer = csv.writer(queue, dialect=dialect, **kwargs)
     encoder = codecs.getincrementalencoder(encoding)()
     return partial(_encode_write_row, stream, queue, writer, encoder)
+
+
+get_unicode_row_writer = get_csv_row_writer

@@ -64,7 +64,7 @@ setup_args = dict(
     keywords="data",
     url="https://github.com/johnwlockwood/karl_data",
     package_dir={'karld': 'karld'},
-    packages=find_packages(),
+    packages=find_packages(exclude=('example')),
     install_requires=get_install_requires(),
     tests_require=get_test_requires(),
     long_description=read('README.md'),

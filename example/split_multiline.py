@@ -25,7 +25,6 @@ def main():
         # Split the file, with a default max_lines=2 per shard of the file.
         split_multi_line_csv_file(in_file_path, out_dir, max_lines=2)
 
-
         # Split csv file writing with custom a delimiter
         my_split_file_writer = partial(
             split_file_output_csv,

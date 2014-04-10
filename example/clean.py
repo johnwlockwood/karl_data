@@ -1,7 +1,10 @@
 import argparse
 from functools import partial
+from itertools import chain
+from operator import itemgetter
 from operator import methodcaller
 import os
+
 from karld.loadump import is_file_csv
 from karld.run_together import csv_file_to_file
 from karld.run_together import pool_run_files_to_files
@@ -14,7 +17,8 @@ def titlize(data_items):
 
     :param data_items: A sequence of unicode strings
     """
-    return (map(methodcaller('title'), row) for row in data_items)
+    return (tuple(chain([index], map(methodcaller('title'), row)))
+            for index, row in enumerate(sorted(data_items, key=itemgetter(1))))
 
 
 def run(in_dir, out_dir, pool):

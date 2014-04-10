@@ -110,11 +110,11 @@ def pool_run_files_to_files(file_to_file, in_dir, filter_func=None):
     with ProcessPoolExecutor() as pool:
         list(pool.map(file_to_file, results_final))
 
+
 def serial_run_files_to_files(file_to_file, in_dir, filter_func=None):
     """
-    With a map files in in_dir over
-    file_to_file function.
-    
+    With a map files in in_dir over the file_to_file function.
+
     Using this to debug your file_to_file function can
     make it easier.
 
@@ -123,7 +123,6 @@ def serial_run_files_to_files(file_to_file, in_dir, filter_func=None):
     :param filter_func: Takes a tuple of path and base \
     name of a file and returns a bool.
     """
-    from concurrent.futures import ProcessPoolExecutor
     results = i_walk_dir_for_filepaths_names(in_dir)
     if filter_func:
         results_final = ifilter(filter_func, results)

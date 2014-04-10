@@ -227,10 +227,19 @@ the csv reader and writer use the default dialect.
     customize this for non-default options:
      `custom_reader = partial(csv_reader, delimiter="|");`
      `split_multi_line_csv_file('input_file.csv', line_reader=custom_reader)`
-     or
-     `custom_writer = partial(split_file_output_csv, delimiter="|");`
+
+     Writing the csv data with a non-default dialect requires defining
+     a split_file_writer with a custom write_as_csv with a custom
+     csv row writer factory.
+
+     ```my_split_file_writer = partial(
+            split_file_output_csv,
+            write_as_csv=partial(
+                write_as_csv,
+                get_csv_row_writer=partial(
+                    get_csv_row_writer, delimiter="|")))```
      `split_multi_line_csv_file('input_file.csv',
-      split_file_writer=custom_writer)`
+      split_file_writer=my_split_file_writer)`
 
 """
 

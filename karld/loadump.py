@@ -42,6 +42,16 @@ def ensure_file_path_dir(file_path):
     ensure_dir(os.path.abspath(os.path.dirname(file_path)))
 
 
+def i_read_buffered_file(file_name, buffering=FILE_BUFFER_SIZE):
+    """
+    Generator of lines of a file name, with buffering for
+    speed.
+    """
+    with open(file_name, 'rb', buffering=buffering) as stream:
+        for line in stream:
+            yield line
+
+
 def i_get_csv_data(file_name, *args, **kwargs):
     """A generator for reading a csv file.
     """

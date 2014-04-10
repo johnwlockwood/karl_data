@@ -13,7 +13,9 @@ from karld.run_together import serial_run_files_to_files
 
 def titlize(data_items):
     """
-    Applies title case to every field.
+    Sort the data by the second row, enumerate it,
+    apply title case to every field and include
+    the index in the in the row.
 
     :param data_items: A sequence of unicode strings
     """

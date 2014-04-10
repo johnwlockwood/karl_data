@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from datetime import datetime
 from itertools import ifilter
 from operator import itemgetter
@@ -102,7 +103,7 @@ def combine_things(iterables):
     grouped_items = sort_merge_group(iterables,
                                      key=itemgetter(THING_KIND))
     for group in grouped_items:
-        for item in group[1]:
+        for item in sorted(group[1]):
             yield item
 
 
@@ -154,16 +155,19 @@ class TestFileSystemIntegration(unittest.TestCase):
         with open(expected_file) as result_file:
             contents = result_file.read()
             self.assertEqual(
-                ['cat, animal',
-                 'cheese, dairy',
-                 'tomato, fruit',
-                 'apple, fruit',
-                 'peach, fruit',
-                 'pear, fruit',
-                 'orange, fruit',
-                 'mushroom, fungus',
-                 'iron, metal',
-                 'titanium, metal',
-                 'topaz, mineral',
-                 'ruby, mineral',
-                 'celery, vegetable'], contents.splitlines())
+                ['cat,animal',
+                 'cheese,dairy',
+                 'apple,fruit',
+                 'orange,fruit',
+                 'peach,fruit',
+                 'pear,fruit',
+                 'tomato,fruit',
+                 'mushroom,fungus',
+                 'iron,metal',
+                 'titanium,metal',
+                 'ruby,mineral',
+                 'topaz,mineral',
+                 'WĄŻ,utf-8 sample',
+                 'dróżką,utf-8 sample',
+                 'celery,vegetable'],
+                contents.splitlines())

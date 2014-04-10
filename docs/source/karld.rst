@@ -57,6 +57,14 @@ karld Package
     :undoc-members:
     :show-inheritance:
 
+:mod:`unicode_io` Module
+--------------------------
+
+.. automodule:: karld.unicode_io
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 Subpackages
 -----------
 

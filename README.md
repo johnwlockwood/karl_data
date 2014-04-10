@@ -40,3 +40,22 @@ Use split_file to split up your data files.
 
     if __name__ == "__main__":
         main()
+
+
+Contributing:
+==================
+Make pull requests to **development** branch of
+ https://github.com/johnwlockwood/karl_data.
+
+**Documentation** is written in reStructuredText and currently uses the
+ Sphinx style for field
+ lists http://sphinx-doc.org/domains.html#info-field-lists
+
+Check out closed pull requests to see the flow of development, as almost
+every change to master is done via a pull request on **GitHub**. Code Reviews
+are welcome, even on merged Pull Requests. Feel free to ask questions about
+the code.
+
+Documentation
+========================
+Read the docs: http://karld.readthedocs.org/en/latest/

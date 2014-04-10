@@ -11,11 +11,14 @@ import heapq
 def merge(*iterables, **kwargs):
     """Merge multiple sorted inputs into a single sorted output.
 
-   Similar to sorted(itertools.chain(*iterables)) but returns a generator,
+   Similar to sorted(itertools.chain(\*iterables)) but returns a generator,
    does not pull the data into memory all at once, and assumes that each of
    the input streams is already sorted (smallest to largest).
 
-   >>> list(merge([1,3,5,7], [0,2,4,8], [5,10,15,20], [], [25]))
+   >>> list(merge([[2,1],[2,3],[2,5],[2,7]],
+   [[2,0],[2,2],[2,4],[2,8]],
+   [[2,5],[2,10],[2,15],[2,20]],
+   [], [[2,25]]), key=itemgetter(-1))
    [0, 1, 2, 3, 4, 5, 5, 7, 8, 10, 15, 20, 25]
 
    """

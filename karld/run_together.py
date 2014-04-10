@@ -2,7 +2,6 @@ from functools import partial
 from itertools import ifilter
 import os
 
-from concurrent.futures import ProcessPoolExecutor
 from karld.iter_utils import yield_nth_of
 
 from .loadump import ensure_dir
@@ -18,9 +17,14 @@ def csv_file_to_file(csv_rows_consumer, out_prefix, out_dir, file_path_name):
     as a csv file into out_dir as the same name, lowered, and prefixed.
 
     :param csv_rows_consumer: consumes data_items yielding collection for each
-    :param out_prefix: :class: `str` prefix out_file_name
-    :param out_dir: :class: `str` directory to write output file to
-    :param file_path_name: :class: `str` path to input csv file
+    :type csv_rows_consumer: function
+    :param out_prefix: prefix out_file_name
+    :type out_prefix: str
+    :param out_dir: directory to write output file to
+    :type out_dir: str
+    :param file_path_name: path to input csv file
+    :type file_path_name: str, str
+
     """
     data_path, data_file_name = file_path_name
     data_items = i_get_csv_data(data_path)
@@ -61,13 +65,13 @@ def csv_files_to_file(csv_rows_consumer,
 
     :param csv_rows_consumer: consumes data_items yielding collection for each
     :param out_prefix: prefix out_file_name
-    :type out_prefix: `str`
+    :type out_prefix: str
     :param out_dir: Directory to write output file to.
-    :type out_dir: `str`
+    :type out_dir: str
     :param out_file_name: Output file base name.
-    :type out_file_name: `str`
-    :param file_path_names: `tuple` of paths and basenames to input csv files
-    :type file_path_names: `tuple`
+    :type out_file_name: str
+    :param file_path_names: tuple of paths and basenames to input csv files
+    :type file_path_names: str, str
     """
     ensure_dir(out_dir)
     out_filename = os.path.join(
@@ -90,9 +94,10 @@ def pool_run_files_to_files(file_to_file, in_dir, filter_func=None):
 
     :param file_to_file: callable that takes file paths.
     :param in_dir: path to process all files from.
-    :param filter_func: callable that takes a tuple
-    of path and base name of a file and returns a bool.
+    :param filter_func: Takes a tuple of path and base \
+    name of a file and returns a bool.
     """
+    from concurrent.futures import ProcessPoolExecutor
     results = i_walk_dir_for_filepaths_names(in_dir)
     if filter_func:
         results_final = ifilter(filter_func, results)

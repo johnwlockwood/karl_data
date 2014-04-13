@@ -7,7 +7,7 @@ from karld.loadump import write_as_csv
 from karld.unicode_io import get_csv_row_writer
 
 big_file_names = [
-    "unsplit.csv"
+    "data.csv"
 ]
 
 data_path = os.path.join('multiline')

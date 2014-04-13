@@ -19,8 +19,24 @@ def titlize(data_items):
 
     :param data_items: A sequence of unicode strings
     """
-    return (tuple(chain([index], map(methodcaller('title'), row)))
-            for index, row in enumerate(sorted(data_items, key=itemgetter(1))))
+    original_index_added = (
+        (unicode(o_index), item[0].title(), item[1].title())
+        for o_index, item in enumerate(data_items)
+
+    )
+
+
+    items = tuple(tuple(chain([index], row))
+            for index, row in
+            enumerate(
+                sorted(
+                    original_index_added
+                    , key=itemgetter(2)
+                )
+            )
+    )
+
+    return items
 
 
 def run(in_dir, out_dir, pool):
@@ -49,15 +65,19 @@ def main(*args):
 
     or::
 
-        python clean.py --in-dir split_data_ml/unsplit --out-dir titlized
+        python clean.py --pool True
 
     or::
 
-        python clean.py --pool True --in-dir split_data_ml/unsplit --out-dir titlized
+        python clean.py --in-dir split_data_ml/data --out-dir my_clean_data
+
+    or::
+
+        python clean.py --pool True --in-dir split_data_ml/data
     """
     parser = argparse.ArgumentParser(*args)
     parser.add_argument("--in-dir",
-                        default=os.path.join("split_data_ml", "unsplit"),
+                        default=os.path.join("split_data_ml", "data"),
                         help="Data source directory")
     parser.add_argument("--out-dir", default="clean_data",
                         help="Data output directory")

@@ -1,10 +1,18 @@
 # -*- coding: utf-8 -*-
-
+import sys
 import csv
 import codecs
-import cStringIO
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from io import StringIO
+
 from functools import partial
-from itertools import imap
+try:
+    from itertools import imap
+except ImportError:
+    imap = map
+
 from operator import methodcaller
 
 #Unicode IO
@@ -71,10 +79,23 @@ and writing csv data in whatever encoding your data
 is in.
 """
 
+PY3 = sys.version > '3'
+
 encode_utf8 = methodcaller('encode', "utf-8")
 decode_utf8 = methodcaller('decode', "utf-8")
-decode_utf8_to_unicode = partial(unicode, encoding="utf-8")
-map_decode_utf8_to_unicode = partial(map, decode_utf8_to_unicode)
+
+
+def not_implemented(*args, **kwargs):
+    raise NotImplementedError()
+
+
+if PY3:
+    unicode = str
+    decode_utf8_to_unicode = not_implemented
+    map_decode_utf8_to_unicode = not_implemented
+else:
+    decode_utf8_to_unicode = partial(unicode, encoding="utf-8")
+    map_decode_utf8_to_unicode = partial(map, decode_utf8_to_unicode)
 
 
 def unicode_csv_unicode_reader(unicode_csv_data, dialect=csv.excel, **kwargs):
@@ -178,10 +199,15 @@ def get_csv_row_writer(stream, dialect=csv.excel, encoding="utf-8", **kwargs):
             for row in my_row_data:
                 unicode_row_writer(row)
     """
-    queue = cStringIO.StringIO()
-    writer = csv.writer(queue, dialect=dialect, **kwargs)
-    encoder = codecs.getincrementalencoder(encoding)()
-    return partial(_encode_write_row, stream, queue, writer, encoder)
+    if PY3:
+        writer = csv.writer(stream, dialect=dialect, **kwargs)
+        return writer.writerow
+
+    else:
+        queue = StringIO()
+        writer = csv.writer(queue, dialect=dialect, **kwargs)
+        encoder = codecs.getincrementalencoder(encoding)()
+        return partial(_encode_write_row, stream, queue, writer, encoder)
 
 
 get_unicode_row_writer = get_csv_row_writer

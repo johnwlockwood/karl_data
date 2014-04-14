@@ -2,7 +2,7 @@ from functools import partial
 from itertools import groupby
 from itertools import ifilter
 
-
+import logging
 import heapq
 
 #generator that gets sorted iterator
@@ -60,7 +60,7 @@ def sorted_by(key, items):
 def sort_iterables(iterables, key=None):
     assert key is not None
     sorted_by_key = partial(sorted_by, key)
-    return map(sorted_by_key, iterables)
+    return list(map(sorted_by_key, iterables))
 
 
 def i_merge_group_sorted(iterables, key=None):

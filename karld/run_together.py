@@ -129,4 +129,4 @@ def serial_run_files_to_files(file_to_file, in_dir, filter_func=None):
     else:
         results_final = results
 
-    map(file_to_file, results_final)
+    list(map(file_to_file, results_final))

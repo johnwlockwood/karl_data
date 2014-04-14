@@ -1,9 +1,13 @@
 import os
+import sys
 import json
 
 from itertools import chain
 from itertools import count
-from itertools import imap
+try:
+    from itertools import imap
+except ImportError:
+    imap = map
 from itertools import repeat
 from itertools import starmap
 
@@ -14,6 +18,9 @@ from operator import itemgetter
 from karld.iter_utils import i_batch
 from karld.unicode_io import csv_reader
 from karld.unicode_io import get_csv_row_writer
+
+
+PY3 = sys.version > '3'
 
 LINE_BUFFER_SIZE = 5000
 FILE_BUFFER_SIZE = 10485760  # -1  # 419430400
@@ -42,21 +49,29 @@ def ensure_file_path_dir(file_path):
     ensure_dir(os.path.abspath(os.path.dirname(file_path)))
 
 
-def i_read_buffered_file(file_name, buffering=FILE_BUFFER_SIZE):
+def i_read_buffered_file(file_name, buffering=FILE_BUFFER_SIZE, binary=True):
     """
     Generator of lines of a file name, with buffering for
     speed.
     """
-    with open(file_name, 'rb', buffering=buffering) as stream:
+    kwargs = dict(buffering=buffering)
+    if PY3:
+        kwargs.update(dict(newline=''))
+    with open(file_name, 'r' + ('b' if binary else 't'), **kwargs) as stream:
         for line in stream:
             yield line
+
+
+i_read_buffered_text_file = partial(i_read_buffered_file, binary=False)
+i_read_buffered_binary_file = partial(i_read_buffered_file, binary=True)
 
 
 def i_get_csv_data(file_name, *args, **kwargs):
     """A generator for reading a csv file.
     """
     buffering = kwargs.get('buffering', FILE_BUFFER_SIZE)
-    for row in csv_reader(i_read_buffered_file(file_name, buffering=buffering), *args, **kwargs):
+    for row in csv_reader(i_read_buffered_file(file_name, buffering=buffering),
+                          *args, **kwargs):
         yield row
 
 
@@ -80,10 +95,15 @@ def write_as_csv(items, file_name, append=False,
     if line_buffer_size is None:
         line_buffer_size = LINE_BUFFER_SIZE
     if append:
-        mode = 'ab'
+        mode = 'a'
     else:
-        mode = 'wtb'
-    with open(file_name, mode, buffering=buffering) as csv_file:
+        mode = 'w'
+
+    kwargs = dict(buffering=buffering)
+    if PY3:
+        kwargs.update(dict(newline=''))
+
+    with open(file_name, mode, **kwargs) as csv_file:
         write_row = get_csv_row_writer(csv_file)
         batches = i_batch(line_buffer_size, items)
         for batch in batches:
@@ -185,7 +205,7 @@ def split_file_output(name, data, out_dir, max_lines=1100,
     for group in batches:
         file_path = os.path.join(out_dir,
                                  "{0}_{1}".format(next(index), name))
-        with open(file_path, 'wt', buffering=buffering) as shard_file:
+        with open(file_path, 'wb', buffering=buffering) as shard_file:
             shard_file.write("".join(group))
 
 
@@ -195,7 +215,7 @@ def raw_line_reader(file_object):
 
 def split_file(file_path, out_dir=None, max_lines=200000,
                buffering=FILE_BUFFER_SIZE, line_reader=raw_line_reader,
-               split_file_writer=split_file_output):
+               split_file_writer=split_file_output, read_binary=True):
     """
     Opens then shards the file.
 
@@ -219,15 +239,22 @@ def split_file(file_path, out_dir=None, max_lines=200000,
     else:
         ensure_dir(out_dir)
 
-    with open(file_path, 'r', buffering=buffering) as data_file:
-        data = line_reader(data_file)
-        split_file_writer(base_name, data, out_dir, max_lines=max_lines,
-                          buffering=buffering)
+    data_file = i_read_buffered_file(file_path, buffering, binary=read_binary)
+    data = line_reader(data_file)
+    split_file_writer(base_name, data, out_dir, max_lines=max_lines,
+                      buffering=buffering)
 
 
 split_multi_line_csv_file = partial(split_file,
                                     line_reader=csv_reader,
-                                    split_file_writer=split_file_output_csv)
+                                    split_file_writer=split_file_output_csv,
+                                    read_binary=True)
+if PY3:
+    split_multi_line_csv_file = partial(split_file,
+                                    line_reader=csv_reader,
+                                    split_file_writer=split_file_output_csv,
+                                    read_binary=False)
+
 split_multi_line_csv_file.__doc__ = """
 Split a large csv file without separating newlines in quotes. Runs slower
 than split_file.

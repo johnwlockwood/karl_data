@@ -107,6 +107,30 @@ def combine_things(iterables):
 
 
 @attr('integration')
+class TestSplitData(unittest.TestCase):
+    def test_data_splits(self):
+
+        from karld.loadump import split_file
+
+        input_data_path = os.path.join(os.path.dirname(__file__),
+                                 "test_data",
+                                 "things_kinds",
+                                 "data_0.csv")
+
+        out_dir = os.path.join(tempfile.gettempdir(),
+                               "karld_test_split_data")
+
+        split_file(input_data_path, out_dir, max_lines=5)
+
+        self.assertTrue(os.path.exists(os.path.join(out_dir, "0_data_0.csv")))
+        self.assertTrue(os.path.exists(os.path.join(out_dir, "1_data_0.csv")))
+
+
+
+
+
+
+@attr('integration')
 class TestFileSystemIntegration(unittest.TestCase):
     """
     Integration tests against the filesystem.

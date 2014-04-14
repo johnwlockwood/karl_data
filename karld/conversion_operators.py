@@ -1,4 +1,8 @@
-from itertools import imap
+try:
+    from itertools import imap
+except ImportError:
+    imap = map
+
 import logging
 import re
 import string

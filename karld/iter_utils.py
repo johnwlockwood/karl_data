@@ -1,5 +1,10 @@
 from functools import partial
-from itertools import imap
+
+try:
+    from itertools import imap
+except ImportError:
+    imap = map
+
 from itertools import islice
 from operator import itemgetter
 

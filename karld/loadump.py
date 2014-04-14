@@ -56,10 +56,8 @@ def i_get_csv_data(file_name, *args, **kwargs):
     """A generator for reading a csv file.
     """
     buffering = kwargs.get('buffering', FILE_BUFFER_SIZE)
-    with open(file_name, 'rb', buffering=buffering) as csv_file:
-        reader = csv_reader(csv_file, *args, **kwargs)
-        for row in reader:
-            yield row
+    for row in csv_reader(i_read_buffered_file(file_name, buffering=buffering), *args, **kwargs):
+        yield row
 
 
 def write_as_csv(items, file_name, append=False,

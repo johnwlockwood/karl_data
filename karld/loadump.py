@@ -7,6 +7,8 @@ from itertools import imap
 from itertools import repeat
 from itertools import starmap
 
+from functools import partial
+
 from operator import itemgetter
 
 from karld.iter_utils import i_batch
@@ -40,18 +42,27 @@ def ensure_file_path_dir(file_path):
     ensure_dir(os.path.abspath(os.path.dirname(file_path)))
 
 
+def i_read_buffered_file(file_name, buffering=FILE_BUFFER_SIZE):
+    """
+    Generator of lines of a file name, with buffering for
+    speed.
+    """
+    with open(file_name, 'rb', buffering=buffering) as stream:
+        for line in stream:
+            yield line
+
+
 def i_get_csv_data(file_name, *args, **kwargs):
     """A generator for reading a csv file.
     """
     buffering = kwargs.get('buffering', FILE_BUFFER_SIZE)
-    with open(file_name, 'rb', buffering=buffering) as csv_file:
-        reader = csv_reader(csv_file, *args, **kwargs)
-        for row in reader:
-            yield row
+    for row in csv_reader(i_read_buffered_file(file_name, buffering=buffering), *args, **kwargs):
+        yield row
 
 
 def write_as_csv(items, file_name, append=False,
-                 line_buffer_size=None, buffering=FILE_BUFFER_SIZE):
+                 line_buffer_size=None, buffering=FILE_BUFFER_SIZE,
+                 get_csv_row_writer=get_csv_row_writer):
     """
     Writes out items to a csv file in groups.
 
@@ -61,6 +72,10 @@ def write_as_csv(items, file_name, append=False,
     :param line_buffer_size: number of lines to write at a time.
     :param buffering: number of bytes to buffer files
     :type buffering: int
+    :param get_csv_row_writer: callable that returns a csv row writer function,
+     customize this for non-default options:
+     `custom_writer = partial(get_csv_row_writer, delimiter="|");`
+     `write_as_csv(items, 'my_out_file', get_csv_row_writer=custom_writer)`
     """
     if line_buffer_size is None:
         line_buffer_size = LINE_BUFFER_SIZE
@@ -121,8 +136,9 @@ def split_file_output_json(filename, dict_list, max_lines=1100,
             buffering=buffering)
 
 
-def split_file_output_csv(filename, data, max_lines=1100, out_dir=None,
-                          buffering=FILE_BUFFER_SIZE):
+def split_file_output_csv(filename, data, out_dir=None, max_lines=1100,
+                          buffering=FILE_BUFFER_SIZE,
+                          write_as_csv=write_as_csv):
     """
     Split an iterable of csv serializable rows of data
      into groups and write each to a csv shard.
@@ -173,8 +189,13 @@ def split_file_output(name, data, out_dir, max_lines=1100,
             shard_file.write("".join(group))
 
 
+def raw_line_reader(file_object):
+    return (line for line in file_object)
+
+
 def split_file(file_path, out_dir=None, max_lines=200000,
-               buffering=FILE_BUFFER_SIZE):
+               buffering=FILE_BUFFER_SIZE, line_reader=raw_line_reader,
+               split_file_writer=split_file_output):
     """
     Opens then shards the file.
 
@@ -199,9 +220,36 @@ def split_file(file_path, out_dir=None, max_lines=200000,
         ensure_dir(out_dir)
 
     with open(file_path, 'r', buffering=buffering) as data_file:
-        data = (line for line in data_file)
-        split_file_output(base_name, data, out_dir, max_lines=max_lines,
+        data = line_reader(data_file)
+        split_file_writer(base_name, data, out_dir, max_lines=max_lines,
                           buffering=buffering)
+
+
+split_multi_line_csv_file = partial(split_file,
+                                    line_reader=csv_reader,
+                                    split_file_writer=split_file_output_csv)
+split_multi_line_csv_file.__doc__ = """
+Split a large csv file without separating newlines in quotes. Runs slower
+than split_file.
+the csv reader and writer use the default dialect.
+    customize this for non-default options:
+     `custom_reader = partial(csv_reader, delimiter="|");`
+     `split_multi_line_csv_file('input_file.csv', line_reader=custom_reader)`
+
+     Writing the csv data with a non-default dialect requires defining
+     a split_file_writer with a custom write_as_csv with a custom
+     csv row writer factory.
+
+     ```my_split_file_writer = partial(
+            split_file_output_csv,
+            write_as_csv=partial(
+                write_as_csv,
+                get_csv_row_writer=partial(
+                    get_csv_row_writer, delimiter="|")))```
+     `split_multi_line_csv_file('input_file.csv',
+      split_file_writer=my_split_file_writer)`
+
+"""
 
 
 def file_path_and_name(path, base_name):

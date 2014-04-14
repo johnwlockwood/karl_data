@@ -16,3 +16,16 @@ size data.
 
 karld is here to help. First off, the name karld was chosen
 because it sounds like knarled, but it's knot.
+
+Examples
+==============================
+
+Split a csv data file
+++++++++++++++++++++++
+From the example directory available by cloning the repository at https://github.com/johnwlockwood/karl_data,
+
+python split_multiline.py
+
+This will read multiline/data.csv and produce split_data_ml and split_data_ml_pipe.
+Run it and compare the input and output. Checkout the source.
+

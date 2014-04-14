@@ -3,10 +3,12 @@ from itertools import ifilter
 import os
 
 from karld.iter_utils import yield_nth_of
+from karld.unicode_io import csv_reader
 
 from .loadump import ensure_dir
-from .loadump import i_walk_dir_for_filepaths_names
 from .loadump import i_get_csv_data
+from .loadump import i_read_buffered_file
+from .loadump import i_walk_dir_for_filepaths_names
 from .loadump import write_as_csv
 
 
@@ -27,7 +29,8 @@ def csv_file_to_file(csv_rows_consumer, out_prefix, out_dir, file_path_name):
 
     """
     data_path, data_file_name = file_path_name
-    data_items = i_get_csv_data(data_path)
+    lines = i_read_buffered_file(data_path)
+    data_items = csv_reader(lines)
     ensure_dir(out_dir)
     out_filename = os.path.join(
         out_dir, '{}{}'.format(
@@ -106,3 +109,24 @@ def pool_run_files_to_files(file_to_file, in_dir, filter_func=None):
 
     with ProcessPoolExecutor() as pool:
         list(pool.map(file_to_file, results_final))
+
+
+def serial_run_files_to_files(file_to_file, in_dir, filter_func=None):
+    """
+    With a map files in in_dir over the file_to_file function.
+
+    Using this to debug your file_to_file function can
+    make it easier.
+
+    :param file_to_file: callable that takes file paths.
+    :param in_dir: path to process all files from.
+    :param filter_func: Takes a tuple of path and base \
+    name of a file and returns a bool.
+    """
+    results = i_walk_dir_for_filepaths_names(in_dir)
+    if filter_func:
+        results_final = ifilter(filter_func, results)
+    else:
+        results_final = results
+
+    map(file_to_file, results_final)

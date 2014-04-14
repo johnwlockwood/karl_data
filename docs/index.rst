@@ -14,6 +14,7 @@ Contents:
    getting-started
    source/karld
    source/karld.tests
+   source/example
 
 Indices and tables
 ==================

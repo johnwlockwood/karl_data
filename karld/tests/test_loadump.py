@@ -13,7 +13,6 @@ from karld.loadump import ensure_dir
 from karld.loadump import i_walk_dir_for_filepaths_names
 from karld.loadump import is_file_csv
 from karld.merger import sort_merge_group
-from karld.run_together import csv_files_to_file
 
 
 class TestDirectoryFunctions(unittest.TestCase):
@@ -124,6 +123,8 @@ class TestFileSystemIntegration(unittest.TestCase):
         the paths and basenames of the files in the
         test_data directory.
         """
+        from karld.run_together import csv_files_to_file
+
         out_dir = os.path.join(tempfile.gettempdir(),
                                "karld_test_sort_merge")
 

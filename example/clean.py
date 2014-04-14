@@ -24,14 +24,15 @@ def contrived_cleaner(data_items):
         for o_index, item in enumerate(data_items)
 
     )
-
+    ROWTWO = 2
+    rowtwo_getter = itemgetter(ROWTWO)
 
     items = tuple(tuple(chain([index], row))
             for index, row in
             enumerate(
                 sorted(
                     original_index_added
-                    , key=itemgetter(2)
+                    , key=rowtwo_getter
                 )
             )
     )
@@ -51,7 +52,7 @@ def run(in_dir, out_dir, pool):
 
     files_to_files_runner(
         partial(csv_file_to_file,
-                titlize,
+                contrived_cleaner,
                 "",
                 out_dir),
         in_dir, filter_func=is_file_csv)

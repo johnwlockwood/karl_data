@@ -51,4 +51,4 @@ build_win:
 	python setup.py bdist_wininst
 
 release: distclean
-	python setup.py sdist bdist_wininst upload -r pypi
+	python setup.py sdist bdist_wininst bdist_egg upload -r pypi

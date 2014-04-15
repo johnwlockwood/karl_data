@@ -1,7 +1,15 @@
+from operator import methodcaller
+import sys
+
 try:
     from itertools import imap
 except ImportError:
     imap = map
+
+PY3 = sys.version > '3'
+
+if PY3:
+    unicode = str
 
 import logging
 import re
@@ -9,6 +17,9 @@ import string
 from collections import OrderedDict
 
 NOT_NUMBER_REG = re.compile(r'\D')
+
+
+str_strip = methodcaller('strip')
 
 
 def apply_conversion_map(conversion_map, entity):
@@ -52,7 +63,7 @@ def join_stripped_gotten_value(sep, getters, data):
     return sep.join(
         filter(
             None,
-            imap(string.strip,
+            imap(str_strip,
                  imap(unicode,
                       filter(None, [getter(data) for getter in getters])))))
 
@@ -71,5 +82,5 @@ def join_stripped_values(sep, collection_getter, data):
     return sep.join(
         filter(
             None,
-            imap(string.strip,
+            imap(str_strip,
                  imap(unicode, filter(None, collection_getter(data))))))

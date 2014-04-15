@@ -1,9 +1,12 @@
 from itertools import islice
-import string
+from operator import methodcaller
 import unittest
 from mock import patch, Mock
 
 from ..run_together import csv_file_to_file
+
+
+str_upper = methodcaller('upper')
 
 
 class TestCSVFileToFile(unittest.TestCase):
@@ -45,7 +48,7 @@ class TestCSVFileToFile(unittest.TestCase):
 
         def row_consumer(rows):
             for row in rows:
-                yield map(string.upper, row)
+                yield list(map(str_upper, row))
 
         mock_row_consumer = Mock(side_effect=row_consumer)
 

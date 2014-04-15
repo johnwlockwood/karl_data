@@ -1,6 +1,13 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
-from itertools import ifilter
+
+try:
+    from itertools import ifilter
+    from itertools import imap
+except ImportError:
+    imap = map
+    ifilter = filter
+
 from operator import itemgetter
 import os
 import tempfile
@@ -20,7 +27,7 @@ class TestDirectoryFunctions(unittest.TestCase):
     Test directory handling functions.
     """
 
-    @patch('os.walk')
+    @patch('karld.loadump.walk')
     def test_i_walk_dir_for_filepaths_names(self, mock_walk):
         """
         Ensure the file names paired with their paths
@@ -36,6 +43,7 @@ class TestDirectoryFunctions(unittest.TestCase):
             yield ("dir1", [], ["tin", "can"])
 
         mock_walk.side_effect = fake_walk
+        # import pdb;pdb.set_trace()
 
         walker = i_walk_dir_for_filepaths_names("fake")
 
@@ -109,13 +117,12 @@ def combine_things(iterables):
 @attr('integration')
 class TestSplitData(unittest.TestCase):
     def test_data_splits(self):
-
         from karld.loadump import split_file
 
         input_data_path = os.path.join(os.path.dirname(__file__),
-                                 "test_data",
-                                 "things_kinds",
-                                 "data_0.csv")
+                                       "test_data",
+                                       "things_kinds",
+                                       "data_0.csv")
 
         out_dir = os.path.join(tempfile.gettempdir(),
                                "karld_test_split_data")
@@ -125,9 +132,11 @@ class TestSplitData(unittest.TestCase):
         self.assertTrue(os.path.exists(os.path.join(out_dir, "0_data_0.csv")))
         self.assertTrue(os.path.exists(os.path.join(out_dir, "1_data_0.csv")))
 
-
-
-
+        with open(os.path.join(out_dir, "0_data_0.csv"), 'rb') as stream:
+            data = stream.read()
+            self.assertEqual(b'mushroom,fungus\ntomato,fruit\ntopaz,mineral\n'
+                             b'iron,metal\ndr\xc3\xb3\xc5\xbck\xc4\x85,'
+                             b'utf-8 sample\n', data)
 
 
 @attr('integration')

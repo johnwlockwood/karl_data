@@ -1,4 +1,5 @@
 import os
+from os import walk
 import sys
 import json
 
@@ -49,14 +50,16 @@ def ensure_file_path_dir(file_path):
     ensure_dir(os.path.abspath(os.path.dirname(file_path)))
 
 
-def i_read_buffered_file(file_name, buffering=FILE_BUFFER_SIZE, binary=True):
+def i_read_buffered_file(file_name, buffering=FILE_BUFFER_SIZE, binary=True,
+                         py3_csv_read=False):
     """
     Generator of lines of a file name, with buffering for
     speed.
     """
     kwargs = dict(buffering=buffering)
-    if PY3:
+    if PY3 and py3_csv_read:
         kwargs.update(dict(newline=''))
+
     with open(file_name, 'r' + ('b' if binary else 't'), **kwargs) as stream:
         for line in stream:
             yield line
@@ -70,8 +73,14 @@ def i_get_csv_data(file_name, *args, **kwargs):
     """A generator for reading a csv file.
     """
     buffering = kwargs.get('buffering', FILE_BUFFER_SIZE)
-    for row in csv_reader(i_read_buffered_file(file_name, buffering=buffering),
-                          *args, **kwargs):
+    read_file_kwargs = dict(buffering=buffering)
+    if PY3:
+        read_file_kwargs.update(dict(binary=False))
+        read_file_kwargs.update(dict(py3_csv_read=True))
+
+    data = i_read_buffered_file(file_name, **read_file_kwargs)
+
+    for row in csv_reader(data, *args, **kwargs):
         yield row
 
 
@@ -101,7 +110,10 @@ def write_as_csv(items, file_name, append=False,
 
     kwargs = dict(buffering=buffering)
     if PY3:
+        mode += 't'
         kwargs.update(dict(newline=''))
+    else:
+        mode += 'b'
 
     with open(file_name, mode, **kwargs) as csv_file:
         write_row = get_csv_row_writer(csv_file)
@@ -201,12 +213,17 @@ def split_file_output(name, data, out_dir, max_lines=1100,
     """
     batches = i_batch(max_lines, data)
 
+    if PY3:
+        join_str = b''
+    else:
+        join_str = ''
+
     index = count()
     for group in batches:
         file_path = os.path.join(out_dir,
                                  "{0}_{1}".format(next(index), name))
         with open(file_path, 'wb', buffering=buffering) as shard_file:
-            shard_file.write("".join(group))
+            shard_file.write(join_str.join(group))
 
 
 def raw_line_reader(file_object):
@@ -293,6 +310,9 @@ def file_path_and_name(path, base_name):
     return os.path.join(path, base_name), base_name
 
 
+def identity(*args):
+    return args
+
 def i_walk_dir_for_paths_names(root_dir):
     """
     Walks a directory yielding the directory of files
@@ -303,9 +323,9 @@ def i_walk_dir_for_paths_names(root_dir):
     """
     return chain.from_iterable(
         (
-            imap(None, repeat(subdir), files)
+            imap(identity, repeat(subdir), files)
             for subdir, files
-            in imap(itemgetter(WALK_SUB_DIR, WALK_FILES), os.walk(root_dir))
+            in imap(itemgetter(WALK_SUB_DIR, WALK_FILES), walk(root_dir))
         )
     )
 

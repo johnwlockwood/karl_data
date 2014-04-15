@@ -1,5 +1,12 @@
 from functools import partial
-from itertools import ifilter
+
+try:
+    from itertools import ifilter
+    from itertools import imap
+except ImportError:
+    imap = map
+    ifilter = filter
+
 import os
 
 from karld.iter_utils import yield_nth_of

@@ -1,6 +1,17 @@
 from functools import partial
 from itertools import groupby
-from itertools import ifilter
+from operator import methodcaller, attrgetter
+import sys
+
+PY3 = sys.version > '3'
+
+try:
+    from itertools import ifilter
+    from itertools import imap
+except ImportError:
+    imap = map
+    ifilter = filter
+
 
 import logging
 import heapq
@@ -24,13 +35,17 @@ def merge(*iterables, **kwargs):
    """
     key = kwargs.get('key')
     _heappop, _heapreplace, _StopIteration = heapq.heappop, heapq.heapreplace, StopIteration
+    if PY3:
+        next_method = attrgetter('__next__')
+    else:
+        next_method = attrgetter('next')
 
     h = []
     h_append = h.append
     key_is_None = key is None
     for itnum, it in enumerate(map(iter, iterables)):
         try:
-            nnext = it.next
+            nnext = next_method(it)
             v = nnext()
             h_append([v if key_is_None else key(v), itnum, v, nnext])
         except _StopIteration:
@@ -67,7 +82,8 @@ def i_merge_group_sorted(iterables, key=None):
     assert key is not None
     all_sorted = merge(*iterables, key=key)
     grouped = groupby(all_sorted, key=key)
-    grouped_voters = ((key_value, list(grouped)) for key_value, grouped in grouped)
+    grouped_voters = ((key_value, list(grouped))
+                      for key_value, grouped in grouped)
     return grouped_voters
 
 
@@ -86,7 +102,8 @@ def get_first_if_any(values):
 def get_first_type_instance_of_group(instance_type, group):
     key_value, items = group
     try:
-        return get_first_if_any(filter(lambda vs: isinstance(vs, instance_type), items))
+        return get_first_if_any(
+            list(filter(lambda vs: isinstance(vs, instance_type), items)))
     except ValueError:
         logging.exception("couldn't unpack {0}".format(group))
 

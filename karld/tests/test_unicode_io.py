@@ -2,7 +2,10 @@
 import os
 import unittest
 
-import cStringIO
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from io import StringIO
 
 from karld.unicode_io import unicode_csv_unicode_reader
 from karld.unicode_io import csv_reader
@@ -96,7 +99,7 @@ class TestUnicodeCSVRowWriter(unittest.TestCase):
             [u"dróżką", u"utf-8 sample"]
         ]
 
-        self.file_stream = cStringIO.StringIO()
+        self.file_stream = StringIO()
 
     def test_write_unicode(self):
         """

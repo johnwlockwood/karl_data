@@ -1,9 +1,11 @@
 from functools import partial
 
 try:
+    from itertools import ifilter
     from itertools import imap
 except ImportError:
     imap = map
+    ifilter = filter
 
 from itertools import islice
 from operator import itemgetter

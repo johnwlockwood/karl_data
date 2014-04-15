@@ -10,11 +10,9 @@ except ImportError:
 import os
 
 from karld.iter_utils import yield_nth_of
-from karld.unicode_io import csv_reader
 
 from .loadump import ensure_dir
 from .loadump import i_get_csv_data
-from .loadump import i_read_buffered_file
 from .loadump import i_walk_dir_for_filepaths_names
 from .loadump import write_as_csv
 
@@ -36,8 +34,7 @@ def csv_file_to_file(csv_rows_consumer, out_prefix, out_dir, file_path_name):
 
     """
     data_path, data_file_name = file_path_name
-    lines = i_read_buffered_file(data_path)
-    data_items = csv_reader(lines)
+    data_items = i_get_csv_data(data_path)
     ensure_dir(out_dir)
     out_filename = os.path.join(
         out_dir, '{}{}'.format(

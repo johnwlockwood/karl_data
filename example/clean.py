@@ -2,8 +2,13 @@ import argparse
 from functools import partial
 from itertools import chain
 from operator import itemgetter
-from operator import methodcaller
 import os
+import sys
+
+PY3 = sys.version > '3'
+
+if PY3:
+    unicode = str
 
 from karld.loadump import is_file_csv
 from karld.run_together import csv_file_to_file

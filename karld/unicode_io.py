@@ -2,6 +2,9 @@
 import sys
 import csv
 import codecs
+
+from karld import is_py3
+
 try:
     from cStringIO import StringIO
 except ImportError:
@@ -79,8 +82,6 @@ and writing csv data in whatever encoding your data
 is in.
 """
 
-PY3 = sys.version > '3'
-
 encode_utf8 = methodcaller('encode', "utf-8")
 decode_utf8 = methodcaller('decode', "utf-8")
 
@@ -89,7 +90,7 @@ def not_implemented(*args, **kwargs):
     raise NotImplementedError()
 
 
-if PY3:
+if is_py3():
     unicode = str
     decode_utf8_to_unicode = not_implemented
     map_decode_utf8_to_unicode = not_implemented
@@ -110,7 +111,7 @@ def unicode_csv_unicode_reader(unicode_csv_data, dialect=csv.excel, **kwargs):
     :param unicode_csv_data: An iterable of unicode strings.
     :param dialect: csv dialect
     """
-    if PY3:
+    if is_py3():
         return csv.reader(unicode_csv_data, dialect=dialect, **kwargs)
     else:
         encoded_utf8_data = imap(encode_utf8, unicode_csv_data)
@@ -142,7 +143,7 @@ def csv_reader(csv_data, dialect=csv.excel, encoding="utf-8", **kwargs):
     :param dialect: csv dialect
     :param encoding: The encoding of the given data.
     """
-    if PY3:
+    if is_py3():
         return csv.reader(csv_data, dialect=csv.excel, **kwargs)
 
     reader = csv.reader(
@@ -205,7 +206,7 @@ def get_csv_row_writer(stream, dialect=csv.excel, encoding="utf-8", **kwargs):
             for row in my_row_data:
                 unicode_row_writer(row)
     """
-    if PY3:
+    if is_py3():
         writer = csv.writer(stream, dialect=dialect, **kwargs)
         return writer.writerow
 

@@ -3,11 +3,11 @@ from functools import partial
 from itertools import chain
 from operator import itemgetter
 import os
-import sys
 
-PY3 = sys.version > '3'
+from karld import is_py3
 
-if PY3:
+
+if is_py3():
     unicode = str
 
 from karld.loadump import is_file_csv

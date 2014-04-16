@@ -1,10 +1,10 @@
 import os
 from os import walk
-import sys
 import json
 
 from itertools import chain
 from itertools import count
+
 try:
     from itertools import imap
 except ImportError:
@@ -16,12 +16,10 @@ from functools import partial
 
 from operator import itemgetter
 
+from karld import is_py3
 from karld.iter_utils import i_batch
 from karld.unicode_io import csv_reader
 from karld.unicode_io import get_csv_row_writer
-
-
-PY3 = sys.version > '3'
 
 LINE_BUFFER_SIZE = 5000
 FILE_BUFFER_SIZE = 10485760  # -1  # 419430400
@@ -57,7 +55,7 @@ def i_read_buffered_file(file_name, buffering=FILE_BUFFER_SIZE, binary=True,
     speed.
     """
     kwargs = dict(buffering=buffering)
-    if PY3 and py3_csv_read:
+    if is_py3() and py3_csv_read:
         kwargs.update(dict(newline=''))
 
     with open(file_name, 'r' + ('b' if binary else 't'), **kwargs) as stream:
@@ -74,7 +72,7 @@ def i_get_csv_data(file_name, *args, **kwargs):
     """
     buffering = kwargs.get('buffering', FILE_BUFFER_SIZE)
     read_file_kwargs = dict(buffering=buffering)
-    if PY3:
+    if is_py3():
         read_file_kwargs.update(dict(binary=False))
         read_file_kwargs.update(dict(py3_csv_read=True))
 
@@ -109,7 +107,7 @@ def write_as_csv(items, file_name, append=False,
         mode = 'w'
 
     kwargs = dict(buffering=buffering)
-    if PY3:
+    if is_py3():
         mode += 't'
         kwargs.update(dict(newline=''))
     else:
@@ -213,7 +211,7 @@ def split_file_output(name, data, out_dir, max_lines=1100,
     """
     batches = i_batch(max_lines, data)
 
-    if PY3:
+    if is_py3():
         join_str = b''
     else:
         join_str = ''
@@ -266,11 +264,11 @@ split_multi_line_csv_file = partial(split_file,
                                     line_reader=csv_reader,
                                     split_file_writer=split_file_output_csv,
                                     read_binary=True)
-if PY3:
+if is_py3():
     split_multi_line_csv_file = partial(split_file,
-                                    line_reader=csv_reader,
-                                    split_file_writer=split_file_output_csv,
-                                    read_binary=False)
+                                        line_reader=csv_reader,
+                                        split_file_writer=split_file_output_csv,
+                                        read_binary=False)
 
 split_multi_line_csv_file.__doc__ = """
 Split a large csv file without separating newlines in quotes. Runs slower
@@ -312,6 +310,7 @@ def file_path_and_name(path, base_name):
 
 def identity(*args):
     return args
+
 
 def i_walk_dir_for_paths_names(root_dir):
     """

@@ -1,20 +1,20 @@
 from operator import methodcaller
-import sys
 
 try:
     from itertools import imap
 except ImportError:
     imap = map
 
-PY3 = sys.version > '3'
-
-if PY3:
-    unicode = str
-
 import logging
 import re
-import string
 from collections import OrderedDict
+
+from karld import is_py3
+
+
+if is_py3():
+    unicode = str
+
 
 NOT_NUMBER_REG = re.compile(r'\D')
 

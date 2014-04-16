@@ -3,11 +3,9 @@ import os
 import tempfile
 import unittest
 from datetime import datetime
-import sys
 
 from nose.plugins.attrib import attr
-
-PY3 = sys.version > '3'
+from karld import is_py3
 
 str_upper = methodcaller('upper')
 
@@ -46,7 +44,7 @@ class TestCSVFileToFile(unittest.TestCase):
                          b'utf-8 sample\napple,fruit\ncheese,dairy\n'
                          b'peach,fruit\ncelery,vegetable\n'.decode('utf-8'))
 
-        if PY3:
+        if is_py3():
             with open(expected_file, 'rt') as result_file:
                 contents = result_file.read()
                 self.assertEqual(expected_data, contents)

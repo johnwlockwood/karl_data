@@ -1,9 +1,6 @@
 from functools import partial
 from itertools import groupby
-from operator import methodcaller, attrgetter
-import sys
-
-PY3 = sys.version > '3'
+from operator import attrgetter
 
 try:
     from itertools import ifilter
@@ -15,6 +12,8 @@ except ImportError:
 
 import logging
 import heapq
+
+from karld import is_py3
 
 #generator that gets sorted iterator
 
@@ -35,7 +34,7 @@ def merge(*iterables, **kwargs):
    """
     key = kwargs.get('key')
     _heappop, _heapreplace, _StopIteration = heapq.heappop, heapq.heapreplace, StopIteration
-    if PY3:
+    if is_py3():
         next_method = attrgetter('__next__')
     else:
         next_method = attrgetter('next')

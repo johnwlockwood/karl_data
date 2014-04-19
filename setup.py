@@ -1,14 +1,15 @@
 import os
 import sys
 
-from setuptools import find_packages, setup
-
-from pip.req import parse_requirements
-
 try:
+    from setuptools import find_packages
     from setuptools import setup
+    packages = find_packages()
 except ImportError:
     from distutils.core import setup
+    packages = ['karld', 'karld.tests']
+
+from pip.req import parse_requirements
 
 if sys.argv[-1] == 'publish':
     os.system('python setup.py sdist upload')
@@ -64,7 +65,7 @@ setup_args = dict(
     keywords="data",
     url="https://github.com/johnwlockwood/karl_data",
     package_dir={'karld': 'karld'},
-    packages=find_packages(exclude=('example')),
+    packages=packages,
     install_requires=get_install_requires(),
     tests_require=get_test_requires(),
     long_description=read('README.md'),
@@ -76,6 +77,7 @@ setup_args = dict(
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
     ],
 )
 

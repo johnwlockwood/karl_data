@@ -1,10 +1,21 @@
 # -*- coding: utf-8 -*-
-
+import sys
 import csv
 import codecs
-import cStringIO
+
+from karld import is_py3
+
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from io import StringIO
+
 from functools import partial
-from itertools import imap
+try:
+    from itertools import imap
+except ImportError:
+    imap = map
+
 from operator import methodcaller
 
 #Unicode IO
@@ -73,8 +84,19 @@ is in.
 
 encode_utf8 = methodcaller('encode', "utf-8")
 decode_utf8 = methodcaller('decode', "utf-8")
-decode_utf8_to_unicode = partial(unicode, encoding="utf-8")
-map_decode_utf8_to_unicode = partial(map, decode_utf8_to_unicode)
+
+
+def not_implemented(*args, **kwargs):
+    raise NotImplementedError()
+
+
+if is_py3():
+    unicode = str
+    decode_utf8_to_unicode = not_implemented
+    map_decode_utf8_to_unicode = not_implemented
+else:
+    decode_utf8_to_unicode = partial(unicode, encoding="utf-8")
+    map_decode_utf8_to_unicode = partial(map, decode_utf8_to_unicode)
 
 
 def unicode_csv_unicode_reader(unicode_csv_data, dialect=csv.excel, **kwargs):
@@ -89,11 +111,14 @@ def unicode_csv_unicode_reader(unicode_csv_data, dialect=csv.excel, **kwargs):
     :param unicode_csv_data: An iterable of unicode strings.
     :param dialect: csv dialect
     """
-    encoded_utf8_data = imap(encode_utf8, unicode_csv_data)
+    if is_py3():
+        return csv.reader(unicode_csv_data, dialect=dialect, **kwargs)
+    else:
+        encoded_utf8_data = imap(encode_utf8, unicode_csv_data)
 
-    reader = csv.reader(encoded_utf8_data, dialect=dialect, **kwargs)
+        reader = csv.reader(encoded_utf8_data, dialect=dialect, **kwargs)
 
-    return imap(map_decode_utf8_to_unicode, reader)
+        return imap(map_decode_utf8_to_unicode, reader)
 
 
 def _utf8_iter_recoder(stream, encoding):
@@ -118,6 +143,9 @@ def csv_reader(csv_data, dialect=csv.excel, encoding="utf-8", **kwargs):
     :param dialect: csv dialect
     :param encoding: The encoding of the given data.
     """
+    if is_py3():
+        return csv.reader(csv_data, dialect=csv.excel, **kwargs)
+
     reader = csv.reader(
         _utf8_iter_recoder(csv_data, encoding),
         dialect=dialect, **kwargs
@@ -178,10 +206,15 @@ def get_csv_row_writer(stream, dialect=csv.excel, encoding="utf-8", **kwargs):
             for row in my_row_data:
                 unicode_row_writer(row)
     """
-    queue = cStringIO.StringIO()
-    writer = csv.writer(queue, dialect=dialect, **kwargs)
-    encoder = codecs.getincrementalencoder(encoding)()
-    return partial(_encode_write_row, stream, queue, writer, encoder)
+    if is_py3():
+        writer = csv.writer(stream, dialect=dialect, **kwargs)
+        return writer.writerow
+
+    else:
+        queue = StringIO()
+        writer = csv.writer(queue, dialect=dialect, **kwargs)
+        encoder = codecs.getincrementalencoder(encoding)()
+        return partial(_encode_write_row, stream, queue, writer, encoder)
 
 
 get_unicode_row_writer = get_csv_row_writer

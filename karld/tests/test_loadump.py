@@ -171,6 +171,9 @@ class TestSplitData(unittest.TestCase):
 
         self.assertTrue(os.path.exists(expected_out_0))
 
+        if os.path.exists(expected_out_0):
+            os.remove(expected_out_0)
+
     def test_csv_splits(self):
         """
         Ensure the csv file is split up into files
@@ -187,7 +190,13 @@ class TestSplitData(unittest.TestCase):
             data = stream.read()
             self.assertEqual(b'mushroom,fungus\ntomato,fruit\ntopaz,mineral\n'
                              b'iron,metal\ndr\xc3\xb3\xc5\xbck\xc4\x85,'
-                             b'utf-8 sample\n', data)
+                             b'utf-8 sample\n'.splitlines(), data.splitlines())
+
+    def tearDown(self):
+        if os.path.exists(self.expected_out_0):
+            os.remove(self.expected_out_0)
+        if os.path.exists(self.expected_out_1):
+            os.remove(self.expected_out_1)
 
 
 @attr('integration')
@@ -195,6 +204,7 @@ class TestFileSystemIntegration(unittest.TestCase):
     """
     Integration tests against the filesystem.
     """
+
 
     def test_sort_merge_csv_files_to_file(self):
         """
@@ -221,6 +231,12 @@ class TestFileSystemIntegration(unittest.TestCase):
 
         file_path_names = i_walk_dir_for_filepaths_names(input_dir)
 
+        expected_file = os.path.join(out_dir,
+                                     "{}{}".format(prefix, out_filename))
+
+        if os.path.exists(expected_file):
+            os.remove(expected_file)
+
         csv_file_path_names = ifilter(
             is_file_csv,
             file_path_names)
@@ -232,15 +248,11 @@ class TestFileSystemIntegration(unittest.TestCase):
             out_filename,
             csv_file_path_names)
 
-        expected_file = os.path.join(out_dir,
-                                     "{}{}".format(prefix, out_filename))
-
         self.assertTrue(os.path.exists(expected_file))
 
         with open(expected_file) as result_file:
             contents = result_file.read()
-            self.assertEqual(
-                ['cat,animal',
+            expected_lines = ['cat,animal',
                  'cheese,dairy',
                  'apple,fruit',
                  'orange,fruit',
@@ -254,5 +266,10 @@ class TestFileSystemIntegration(unittest.TestCase):
                  'topaz,mineral',
                  'WĄŻ,utf-8 sample',
                  'dróżką,utf-8 sample',
-                 'celery,vegetable'],
-                contents.splitlines())
+                 'celery,vegetable']
+
+            lines = contents.splitlines()
+            self.assertEqual(expected_lines, lines)
+
+        if os.path.exists(expected_file):
+            os.remove(expected_file)

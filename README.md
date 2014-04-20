@@ -14,10 +14,10 @@ same key throughout the map-sort-merge-group phases.
 Split data
 ----------------------
 
-Use split_file to split up your data files.
+Use split_file to split up your data files or use
 
     import os
-    from karld.loadump import split_file
+    from karld import split_csv_file
 
     big_file_names = [
         "bigfile1.csv",
@@ -35,7 +35,7 @@ Use split_file to split up your data files.
             out_dir = os.path.join(data_path, 'split_data', filename.replace('.csv', ''))
 
             # Split the file, with a default max_lines=200000 per shard of the file.
-            split_file(os.path.join(data_path, filename), out_dir)
+            split_csv_file(os.path.join(data_path, filename), out_dir)
 
 
     if __name__ == "__main__":

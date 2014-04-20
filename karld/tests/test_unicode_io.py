@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import os
 import unittest
 
 try:
@@ -7,7 +6,7 @@ try:
 except ImportError:
     from io import StringIO
 
-from karld.unicode_io import unicode_csv_unicode_reader
+from karld.unicode_io import csv_unicode_reader
 from karld.unicode_io import csv_reader
 from karld.unicode_io import get_csv_row_writer
 
@@ -26,23 +25,24 @@ class TestUnicodeToUnicodeCSVReader(unittest.TestCase):
         are converted to sequences by parsing
         with the csv module.
         """
-        data = [u"this,is,a,test",
-                u"my,name,is,john"]
+        data = u'this,is,"a\na",test\nmy,name,is,john'
+        stream = StringIO(data)
+
         self.assertEqual(
             [
-                [u'this', u'is', u'a', u'test'],
+                [u'this', u'is', u'a\na', u'test'],
                 [u'my', u'name', u'is', u'john'],
             ],
-            list(unicode_csv_unicode_reader(data)))
+            list(csv_unicode_reader(stream)))
 
     def test_iterative(self):
         """
-        Ensure unicode_csv_unicode_reader consumes iteratively.
+        Ensure csv_unicode_reader consumes iteratively.
         """
 
         data = iter([u"this,is,a,test",
                      u"my,name,is,john"])
-        reader = unicode_csv_unicode_reader(data)
+        reader = csv_unicode_reader(data)
         first_row = next(reader)
         self.assertEqual([u'this', u'is', u'a', u'test'], first_row)
         self.assertEqual(u"my,name,is,john", next(data))

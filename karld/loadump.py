@@ -141,7 +141,7 @@ def dump_dicts_to_json_file(file_name, dicts, buffering=FILE_BUFFER_SIZE):
     """
     with open(file_name, 'w+', buffering=buffering) as json_file:
         for item in dicts:
-            json_file.write(json.dumps(item) + "\n")
+            json_file.write(json.dumps(item) + os.linesep)
 
 
 def split_file_output_json(filename, dict_list, max_lines=1100,

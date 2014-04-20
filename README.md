@@ -14,7 +14,8 @@ same key throughout the map-sort-merge-group phases.
 Split data
 ----------------------
 
-Use split_file to split up your data files or use
+Use split_file to split up your data files or use split_csv_file to split up
+csv files which may have multi-line fields to ensure they are not broken up.
 
     import os
     from karld import split_csv_file

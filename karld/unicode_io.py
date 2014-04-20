@@ -99,9 +99,9 @@ else:
     map_decode_utf8_to_unicode = partial(map, decode_utf8_to_unicode)
 
 
-def unicode_csv_unicode_reader(unicode_csv_data, dialect=csv.excel, **kwargs):
+def csv_unicode_reader(unicode_csv_data, dialect=csv.excel, **kwargs):
     """
-    Generator the reads a unicode csv data.
+    Generator the reads serialized unicode csv data.
     Use this if you have a stream of data
     in unicode and you want to access the rows
     of the data as sequences encoded as unicode.
@@ -119,6 +119,8 @@ def unicode_csv_unicode_reader(unicode_csv_data, dialect=csv.excel, **kwargs):
         reader = csv.reader(encoded_utf8_data, dialect=dialect, **kwargs)
 
         return imap(map_decode_utf8_to_unicode, reader)
+
+unicode_csv_unicode_reader = csv_unicode_reader
 
 
 def _utf8_iter_recoder(stream, encoding):

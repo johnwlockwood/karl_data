@@ -116,27 +116,87 @@ def combine_things(iterables):
 
 @attr('integration')
 class TestSplitData(unittest.TestCase):
-    def test_data_splits(self):
-        from karld.loadump import split_file
+    def setUp(self):
 
-        input_data_path = os.path.join(os.path.dirname(__file__),
+        self.input_data_path = os.path.join(os.path.dirname(__file__),
                                        "test_data",
                                        "things_kinds",
                                        "data_0.csv")
 
-        out_dir = os.path.join(tempfile.gettempdir(),
+        self.out_dir = os.path.join(tempfile.gettempdir(),
                                "karld_test_split_data")
 
-        split_file(input_data_path, out_dir, max_lines=5)
+        self.expected_out_0 = os.path.join(self.out_dir, "0_data_0.csv")
+        self.expected_out_1 = os.path.join(self.out_dir, "1_data_0.csv")
 
-        self.assertTrue(os.path.exists(os.path.join(out_dir, "0_data_0.csv")))
-        self.assertTrue(os.path.exists(os.path.join(out_dir, "1_data_0.csv")))
+        if os.path.exists(self.expected_out_0):
+            os.remove(self.expected_out_0)
 
-        with open(os.path.join(out_dir, "0_data_0.csv"), 'rb') as stream:
+        if os.path.exists(self.expected_out_1):
+            os.remove(self.expected_out_1)
+
+    def test_data_splits(self):
+        """
+        Ensure the file is split up into files
+        of max_lines.
+        """
+        from karld.loadump import split_file
+
+        split_file(self.input_data_path, self.out_dir, max_lines=5)
+
+        self.assertTrue(os.path.exists(self.expected_out_0))
+        self.assertTrue(os.path.exists(self.expected_out_1))
+
+        with open(self.expected_out_0, 'rb') as stream:
             data = stream.read()
             self.assertEqual(b'mushroom,fungus\ntomato,fruit\ntopaz,mineral\n'
                              b'iron,metal\ndr\xc3\xb3\xc5\xbck\xc4\x85,'
                              b'utf-8 sample\n', data)
+
+    def test_default_out_dir(self):
+        """
+        Ensure default output directory is the same as the directory
+        of the input file
+        """
+        from karld.loadump import split_file
+
+        expected_outdir_dir = os.path.dirname(self.input_data_path)
+
+        expected_out_0 = os.path.join(expected_outdir_dir, "0_data_0.csv")
+
+        if os.path.exists(expected_out_0):
+            os.remove(expected_out_0)
+
+        split_file(self.input_data_path, max_lines=100)
+
+        self.assertTrue(os.path.exists(expected_out_0))
+
+        if os.path.exists(expected_out_0):
+            os.remove(expected_out_0)
+
+    def test_csv_splits(self):
+        """
+        Ensure the csv file is split up into files
+        of max_lines where each line is a valid csv row.
+        """
+        from karld.loadump import split_csv_file
+
+        split_csv_file(self.input_data_path, self.out_dir, max_lines=5)
+
+        self.assertTrue(os.path.exists(self.expected_out_0))
+        self.assertTrue(os.path.exists(self.expected_out_1))
+
+        with open(self.expected_out_0, 'rb') as stream:
+            data = stream.read()
+            self.assertEqual(b'mushroom,fungus\ntomato,fruit\ntopaz,mineral\n'
+                             b'iron,metal\ndr\xc3\xb3\xc5\xbck\xc4\x85,'
+                             b'utf-8 sample\n'.splitlines(), data.splitlines())
+
+    def tearDown(self):
+        if os.path.exists(self.expected_out_0):
+            os.remove(self.expected_out_0)
+        if os.path.exists(self.expected_out_1):
+            os.remove(self.expected_out_1)
 
 
 @attr('integration')
@@ -144,6 +204,7 @@ class TestFileSystemIntegration(unittest.TestCase):
     """
     Integration tests against the filesystem.
     """
+
 
     def test_sort_merge_csv_files_to_file(self):
         """
@@ -170,6 +231,12 @@ class TestFileSystemIntegration(unittest.TestCase):
 
         file_path_names = i_walk_dir_for_filepaths_names(input_dir)
 
+        expected_file = os.path.join(out_dir,
+                                     "{}{}".format(prefix, out_filename))
+
+        if os.path.exists(expected_file):
+            os.remove(expected_file)
+
         csv_file_path_names = ifilter(
             is_file_csv,
             file_path_names)
@@ -181,15 +248,11 @@ class TestFileSystemIntegration(unittest.TestCase):
             out_filename,
             csv_file_path_names)
 
-        expected_file = os.path.join(out_dir,
-                                     "{}{}".format(prefix, out_filename))
-
         self.assertTrue(os.path.exists(expected_file))
 
         with open(expected_file) as result_file:
             contents = result_file.read()
-            self.assertEqual(
-                ['cat,animal',
+            expected_lines = ['cat,animal',
                  'cheese,dairy',
                  'apple,fruit',
                  'orange,fruit',
@@ -203,5 +266,10 @@ class TestFileSystemIntegration(unittest.TestCase):
                  'topaz,mineral',
                  'WĄŻ,utf-8 sample',
                  'dróżką,utf-8 sample',
-                 'celery,vegetable'],
-                contents.splitlines())
+                 'celery,vegetable']
+
+            lines = contents.splitlines()
+            self.assertEqual(expected_lines, lines)
+
+        if os.path.exists(expected_file):
+            os.remove(expected_file)

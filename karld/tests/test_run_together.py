@@ -32,10 +32,13 @@ class TestCSVFileToFile(unittest.TestCase):
         def combiner(items):
             return items
 
-        csv_file_to_file(combiner, prefix, out_dir, file_path_and_name(input_path, "data_0.csv"))
-
         expected_file = os.path.join(out_dir,
                                      "{}{}".format(prefix, out_filename))
+
+        if os.path.exists(expected_file):
+            os.remove(expected_file)
+
+        csv_file_to_file(combiner, prefix, out_dir, file_path_and_name(input_path, "data_0.csv"))
 
         self.assertTrue(os.path.exists(expected_file))
 
@@ -52,3 +55,6 @@ class TestCSVFileToFile(unittest.TestCase):
             with open(expected_file, 'r') as result_file:
                 contents = result_file.read()
                 self.assertEqual(expected_data.splitlines(), contents.decode('utf-8').splitlines())
+
+        if os.path.exists(expected_file):
+            os.remove(expected_file)

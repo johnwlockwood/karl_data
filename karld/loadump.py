@@ -260,17 +260,17 @@ def split_file(file_path, out_dir=None, max_lines=200000,
                       buffering=buffering)
 
 
-split_multi_line_csv_file = partial(split_file,
-                                    line_reader=csv_reader,
-                                    split_file_writer=split_file_output_csv,
-                                    read_binary=True)
+split_csv_file = partial(split_file,
+                         line_reader=csv_reader,
+                         split_file_writer=split_file_output_csv,
+                         read_binary=True)
 if is_py3():
-    split_multi_line_csv_file = partial(split_file,
-                                        line_reader=csv_reader,
-                                        split_file_writer=split_file_output_csv,
-                                        read_binary=False)
+    split_csv_file = partial(split_file,
+                             line_reader=csv_reader,
+                             split_file_writer=split_file_output_csv,
+                             read_binary=False)
 
-split_multi_line_csv_file.__doc__ = """
+split_csv_file.__doc__ = """
 Split a large csv file without separating newlines in quotes. Runs slower
 than split_file.
 the csv reader and writer use the default dialect.
@@ -292,6 +292,8 @@ the csv reader and writer use the default dialect.
       split_file_writer=my_split_file_writer)`
 
 """
+
+split_multi_line_csv_file = split_csv_file
 
 
 def file_path_and_name(path, base_name):

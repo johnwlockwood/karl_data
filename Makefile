@@ -45,10 +45,16 @@ testall: clean
 test: clean unit integrations
 
 build: distclean
-	python setup.py sdist
+	python setup.py sdist bdist_egg
+
+build3:
+	python3 setup.py bdist_egg
 
 build_win:
 	python setup.py bdist_wininst
 
 release: distclean
-	python setup.py sdist bdist_wininst bdist_egg upload -r pypi
+	python setup.py sdist upload -r pypi
+	python setup.py bdist_egg upload -r pypi
+	python3 setup.py bdist_egg upload -r pypi
+	python setup.py bdist_wininst upload -r pypi

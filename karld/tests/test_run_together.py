@@ -1,64 +1,54 @@
-from itertools import islice
-import string
+from operator import methodcaller
+import os
+import tempfile
 import unittest
-from mock import patch, Mock
+from datetime import datetime
 
-from ..run_together import csv_file_to_file
+from nose.plugins.attrib import attr
+from karld import is_py3
+
+str_upper = methodcaller('upper')
 
 
 class TestCSVFileToFile(unittest.TestCase):
-    def setUp(self):
-        self.csv_contents = iter([
-            'a,b',
-            'c,d',
-            'e,f',
-        ])
-        self.csv_list = (
-            [u'a', u'b'],
-            [u'c', u'd'],
-            [u'e', u'f'],
-        )
-
-    @patch('karld.run_together.ensure_dir')
-    @patch('karld.run_together.write_as_csv')
-    @patch('karld.run_together.i_read_buffered_file')
-    @patch('karld.run_together.csv_reader')
-    def test_csv_file_to_file(self,
-                              mock_csv_reader,
-                              mock_file_reader,
-                              mock_out_csv,
-                              mock_ensure_dir):
+    @attr('integration')
+    def test_csv_file_to_file_integration(self):
         """
-        Ensure csv_file_to_file ensures the out directory,
-        then writes as csv to a filename the same as the input
-        filename, but lowercase with a prefix and to the out directory
-        the data from the input file as called with
-        the csv_row_consumer.
-
+        Ensure
         """
-        def out_csv(rows, out_file):
-            return list(islice(rows, 3))
+        from karld.loadump import file_path_and_name
+        from ..run_together import csv_file_to_file
 
-        mock_out_csv.side_effect = out_csv
-        mock_file_reader.return_value = self.csv_contents
-        mock_csv_reader.return_value = self.csv_list
+        out_dir = os.path.join(tempfile.gettempdir(),
+                               "karld_test_csv_file_to_file")
 
-        def row_consumer(rows):
-            for row in rows:
-                yield map(string.upper, row)
+        prefix = str(datetime.now())
 
-        mock_row_consumer = Mock(side_effect=row_consumer)
+        out_filename = "data_0.csv"
+        input_path = os.path.join(os.path.dirname(__file__),
+                                  "test_data",
+                                  "things_kinds")
 
-        out_prefix = "yeah_"
-        out_dir = "out"
-        file_path_name = ("in/File.csv", "File.csv")
-        csv_file_to_file(mock_row_consumer,
-                         out_prefix,
-                         out_dir,
-                         file_path_name)
+        def combiner(items):
+            return items
 
-        mock_ensure_dir.assert_called_once_with("out")
+        csv_file_to_file(combiner, prefix, out_dir, file_path_and_name(input_path, "data_0.csv"))
 
-        self.assertIn('out/yeah_file.csv', mock_out_csv.call_args[0])
+        expected_file = os.path.join(out_dir,
+                                     "{}{}".format(prefix, out_filename))
 
-        mock_row_consumer.assert_called_once_with(self.csv_list)
+        self.assertTrue(os.path.exists(expected_file))
+
+        expected_data = (b'mushroom,fungus\ntomato,fruit\ntopaz,mineral\n'
+                         b'iron,metal\ndr\xc3\xb3\xc5\xbck\xc4\x85,'
+                         b'utf-8 sample\napple,fruit\ncheese,dairy\n'
+                         b'peach,fruit\ncelery,vegetable\n'.decode('utf-8'))
+
+        if is_py3():
+            with open(expected_file, 'rt') as result_file:
+                contents = result_file.read()
+                self.assertEqual(expected_data, contents)
+        else:
+            with open(expected_file, 'r') as result_file:
+                contents = result_file.read()
+                self.assertEqual(expected_data.splitlines(), contents.decode('utf-8').splitlines())

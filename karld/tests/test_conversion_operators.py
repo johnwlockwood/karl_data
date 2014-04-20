@@ -51,7 +51,7 @@ class TestConversion(unittest.TestCase):
         Ensure a string not castable to a number
         raises a ValueError
         """
-        self.assertRaises(ValueError, get_number_as_int('sdfgsd'))
+        self.assertRaises(ValueError, get_number_as_int, 'sdfgsd')
 
     def test_apply_conversion_map(self):
         """
@@ -65,7 +65,7 @@ class TestConversion(unittest.TestCase):
 
         result = apply_conversion_map(conversion_map, ['bruce', 'lara'])
 
-        self.assertEqual(['lara', 'bruce'], result)
+        self.assertEqual(('lara', 'bruce'), result)
 
     def test_apply_conversion_map_map(self):
         """

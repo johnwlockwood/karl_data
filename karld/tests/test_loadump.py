@@ -43,7 +43,6 @@ class TestDirectoryFunctions(unittest.TestCase):
             yield ("dir1", [], ["tin", "can"])
 
         mock_walk.side_effect = fake_walk
-        # import pdb;pdb.set_trace()
 
         walker = i_walk_dir_for_filepaths_names("fake")
 

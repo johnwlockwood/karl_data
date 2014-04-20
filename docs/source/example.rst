@@ -6,7 +6,7 @@ example scripts
 
 Run this script first to split the example data, which has multiple lines in some fields.
 
-.. automodule:: example.split_multiline
+.. automodule:: split_multiline
     :members:
     :undoc-members:
     :show-inheritance:
@@ -16,7 +16,7 @@ Run this script first to split the example data, which has multiple lines in som
 
 Run this script to 'clean' the split up data.
 
-.. automodule:: example.clean
+.. automodule:: clean
     :members:
     :undoc-members:
     :show-inheritance:
@@ -26,7 +26,7 @@ Run this script to 'clean' the split up data.
 
 Run this script first to split the example data that does not have any multiple line in fields.
 
-.. automodule:: example.split_non_multiline
+.. automodule:: split_non_multiline
     :members:
     :undoc-members:
     :show-inheritance:

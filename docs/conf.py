@@ -19,6 +19,12 @@ karld_path = os.path.join(os.path.dirname(os.path.dirname(__file__)))
 if karld_path not in sys.path:
     sys.path.append(karld_path)
 
+example_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
+                            'example')
+
+if example_path not in sys.path:
+    sys.path.append(example_path)
+
 import karld
 
 # If extensions (or modules to document with autodoc) are in another directory,

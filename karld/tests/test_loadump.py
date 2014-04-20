@@ -114,16 +114,59 @@ def combine_things(iterables):
 
 
 @attr('integration')
+class TestJsonSplitOut(unittest.TestCase):
+    def setUp(self):
+        self.out_dir = os.path.join(tempfile.gettempdir(),
+                                    "karld_test_split_data")
+
+        self.expected_out_0 = os.path.join(self.out_dir, "0_outfile.json")
+        self.expected_out_1 = os.path.join(self.out_dir, "1_outfile.json")
+
+        if os.path.exists(self.expected_out_0):
+            os.remove(self.expected_out_0)
+
+        if os.path.exists(self.expected_out_1):
+            os.remove(self.expected_out_1)
+
+    def test_json_out(self):
+        """
+        Ensure sequences of json serializable data
+        is written in rows to files with a maximum of
+        max_lines per file.
+        """
+        from karld import loadump
+
+        data = [{'name': 'value'},
+                      {'thing': 3},
+                      {'this': 4.3},
+                      {"that": "hello\nworld"}]
+
+        loadump.split_file_output_json("outfile.json", data, max_lines=2)
+
+        if os.path.exists(self.expected_out_0):
+            os.remove(self.expected_out_0)
+
+        if os.path.exists(self.expected_out_1):
+            os.remove(self.expected_out_1)
+
+    def tearDown(self):
+        if os.path.exists(self.expected_out_0):
+            os.remove(self.expected_out_0)
+        if os.path.exists(self.expected_out_1):
+            os.remove(self.expected_out_1)
+
+
+@attr('integration')
 class TestSplitData(unittest.TestCase):
     def setUp(self):
 
         self.input_data_path = os.path.join(os.path.dirname(__file__),
-                                       "test_data",
-                                       "things_kinds",
-                                       "data_0.csv")
+                                            "test_data",
+                                            "things_kinds",
+                                            "data_0.csv")
 
         self.out_dir = os.path.join(tempfile.gettempdir(),
-                               "karld_test_split_data")
+                                    "karld_test_split_data")
 
         self.expected_out_0 = os.path.join(self.out_dir, "0_data_0.csv")
         self.expected_out_1 = os.path.join(self.out_dir, "1_data_0.csv")
@@ -252,20 +295,20 @@ class TestFileSystemIntegration(unittest.TestCase):
         with open(expected_file) as result_file:
             contents = result_file.read()
             expected_lines = ['cat,animal',
-                 'cheese,dairy',
-                 'apple,fruit',
-                 'orange,fruit',
-                 'peach,fruit',
-                 'pear,fruit',
-                 'tomato,fruit',
-                 'mushroom,fungus',
-                 'iron,metal',
-                 'titanium,metal',
-                 'ruby,mineral',
-                 'topaz,mineral',
-                 'WĄŻ,utf-8 sample',
-                 'dróżką,utf-8 sample',
-                 'celery,vegetable']
+                              'cheese,dairy',
+                              'apple,fruit',
+                              'orange,fruit',
+                              'peach,fruit',
+                              'pear,fruit',
+                              'tomato,fruit',
+                              'mushroom,fungus',
+                              'iron,metal',
+                              'titanium,metal',
+                              'ruby,mineral',
+                              'topaz,mineral',
+                              'WĄŻ,utf-8 sample',
+                              'dróżką,utf-8 sample',
+                              'celery,vegetable']
 
             lines = contents.splitlines()
             self.assertEqual(expected_lines, lines)

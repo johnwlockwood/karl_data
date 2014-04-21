@@ -15,10 +15,11 @@ Split data
 ----------------------
 
 Use split_file to split up your data files or use split_csv_file to split up
-csv files which may have multi-line fields to ensure they are not broken up.
+csv files which may have multi-line fields to ensure they are not broken up.::
 
     import os
-    from karld import split_csv_file
+
+    import karld
 
     big_file_names = [
         "bigfile1.csv",
@@ -31,16 +32,103 @@ csv files which may have multi-line fields to ensure they are not broken up.
 
     def main():
         for filename in big_file_names:
-            # Name the directory to write the split files into.
-            # I'll make it after the name of the file, removing the extension.
+            # Name the directory to write the split files into based
+            # on the name of the file.
             out_dir = os.path.join(data_path, 'split_data', filename.replace('.csv', ''))
 
             # Split the file, with a default max_lines=200000 per shard of the file.
-            split_csv_file(os.path.join(data_path, filename), out_dir)
+            karld.io.split_csv_file(os.path.join(data_path, filename), out_dir)
 
 
     if __name__ == "__main__":
         main()
+
+
+When you're generating data and want to shard it out to files based on quantity, use
+one of the split output functions such as `split_file_output_csv`, `split_file_output` or
+`split_file_output_json`::
+
+    import os
+    import pathlib
+
+    import karld
+
+
+    def main():
+        """
+        Python 2 version
+        """
+
+        items = (str(x) + os.linesep for x in range(2000))
+
+        out_dir = pathlib.Path('shgen')
+        karld.io.ensure_dir(str(out_dir))
+
+        karld.io.split_file_output('big_data', items, str(out_dir))
+
+
+    if __name__ == "__main__":
+        main()
+
+CSV serializable data::
+
+    import pathlib
+
+    import karld
+
+
+    def main():
+        """
+        From a source of data, shard it to csv files.
+        """
+        if karld.is_py3():
+            third = chr
+        else:
+            third = unichr
+
+        # Your data source
+        items = ((x, x + 1, third(x + 10)) for x in range(2000))
+
+        out_dir = pathlib.Path('shard_out_csv')
+
+        karld.io.ensure_dir(str(out_dir))
+
+        karld.io.split_file_output_csv('big_data.csv', items, str(out_dir))
+
+
+    if __name__ == "__main__":
+        main()
+
+
+Rows of json serializable data::
+
+    import pathlib
+
+    import karld
+
+
+    def main():
+        """
+        From a source of data, shard it to csv files.
+        """
+        if karld.is_py3():
+            third = chr
+        else:
+            third = unichr
+
+        # Your data source
+        items = ((x, x + 1, third(x + 10)) for x in range(2000))
+
+        out_dir = pathlib.Path('shard_out_json')
+
+        karld.io.ensure_dir(str(out_dir))
+
+        karld.io.split_file_output_json('big_data.json', items, str(out_dir))
+
+
+    if __name__ == "__main__":
+        main()
+
 
 
 Contributing:

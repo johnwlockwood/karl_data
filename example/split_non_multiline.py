@@ -1,5 +1,6 @@
 import os
-from karld.loadump import split_file
+
+import karld
 
 big_file_names = [
     "data.csv"
@@ -16,7 +17,7 @@ def main():
                                'split_data_non_multiline', filename.replace('.csv', ''))
 
         # Split the file, with a default max_lines=200000 per shard of the file.
-        split_file(os.path.join(data_path, filename), out_dir, max_lines=2)
+        karld.io.split_file(os.path.join(data_path, filename), out_dir, max_lines=2)
 
 
 if __name__ == "__main__":

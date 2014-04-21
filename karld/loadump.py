@@ -26,6 +26,26 @@ FILE_BUFFER_SIZE = 10485760  # -1  # 419430400
 WALK_SUB_DIR = 0
 WALK_FILES = 2
 
+__all__ = ['dump_dicts_to_json_file',
+           'ensure_dir',
+           'ensure_file_path_dir',
+           'file_path_and_name',
+           'i_get_csv_data',
+           'i_read_buffered_file',
+           'i_read_buffered_text_file',
+           'i_read_buffered_text_file',
+           'i_walk_dir_for_filepaths_names',
+           'i_walk_dir_for_paths_names',
+           'identity',
+           'is_file_csv',
+           'raw_line_reader',
+           'split_csv_file',
+           'split_file',
+           'split_file_output',
+           'split_file_output_csv',
+           'split_file_output_json',
+           'write_as_csv']
+
 
 def ensure_dir(directory):
     """
@@ -141,10 +161,10 @@ def dump_dicts_to_json_file(file_name, dicts, buffering=FILE_BUFFER_SIZE):
     """
     with open(file_name, 'w+', buffering=buffering) as json_file:
         for item in dicts:
-            json_file.write(json.dumps(item) + "\n")
+            json_file.write(json.dumps(item) + os.linesep)
 
 
-def split_file_output_json(filename, dict_list, max_lines=1100,
+def split_file_output_json(filename, dict_list, out_dir=None, max_lines=1100,
                            buffering=FILE_BUFFER_SIZE):
     """
     Split an iterable of JSON serializable rows of data
@@ -153,7 +173,9 @@ def split_file_output_json(filename, dict_list, max_lines=1100,
     :param buffering: number of bytes to buffer files
     :type buffering: int
     """
-    dirname = os.path.dirname(filename)
+    dirname = os.path.abspath(os.path.dirname(filename))
+    if out_dir is None:
+        out_dir = dirname
     basename = os.path.basename(filename)
 
     batches = i_batch(max_lines, dict_list)
@@ -161,7 +183,7 @@ def split_file_output_json(filename, dict_list, max_lines=1100,
     index = count()
     for group in batches:
         dump_dicts_to_json_file(
-            os.path.join(dirname, "{0}_{1}".format(next(index), basename)),
+            os.path.join(out_dir, "{0}_{1}".format(next(index), basename)),
             group,
             buffering=buffering)
 

@@ -73,6 +73,7 @@ one of the split output functions such as ``split_file_output_csv``, ``split_fil
 
     import os
     import pathlib
+
     import karld
 
 
@@ -95,6 +96,7 @@ one of the split output functions such as ``split_file_output_csv``, ``split_fil
 CSV serializable data::
 
     import pathlib
+
     import karld
 
 
@@ -124,6 +126,7 @@ CSV serializable data::
 Rows of json serializable data::
 
     import pathlib
+
     import karld
 
 

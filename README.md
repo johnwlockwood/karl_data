@@ -31,8 +31,8 @@ csv files which may have multi-line fields to ensure they are not broken up.
 
     def main():
         for filename in big_file_names:
-            # Name the directory to write the split files into.
-            # I'll make it after the name of the file, removing the extension.
+            # Name the directory to write the split files into based
+            # on the name of the file.
             out_dir = os.path.join(data_path, 'split_data', filename.replace('.csv', ''))
 
             # Split the file, with a default max_lines=200000 per shard of the file.
@@ -47,26 +47,26 @@ When you're generating data and want to shard it out to files based on quantity,
 one of the split output functions such as `split_file_output_csv`, `split_file_output` or
 `split_file_output_json`
 
-        import os
-        import pathlib
-        import karld
+    import os
+    import pathlib
+    import karld
 
 
-        def main():
-            """
-            Python 2 version
-            """
+    def main():
+        """
+        Python 2 version
+        """
 
-            items = (str(x) + os.linesep for x in range(2000))
+        items = (str(x) + os.linesep for x in range(2000))
 
-            out_dir = pathlib.Path('shgen')
-            karld.io.ensure_dir(str(out_dir))
+        out_dir = pathlib.Path('shgen')
+        karld.io.ensure_dir(str(out_dir))
 
-            karld.io.split_file_output('big_data', items, str(out_dir))
+        karld.io.split_file_output('big_data', items, str(out_dir))
 
 
-        if __name__ == "__main__":
-            main()
+    if __name__ == "__main__":
+        main()
 
 
 Contributing:

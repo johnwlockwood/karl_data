@@ -164,7 +164,7 @@ def dump_dicts_to_json_file(file_name, dicts, buffering=FILE_BUFFER_SIZE):
             json_file.write(json.dumps(item) + os.linesep)
 
 
-def split_file_output_json(filename, dict_list, max_lines=1100,
+def split_file_output_json(filename, dict_list, out_dir=None, max_lines=1100,
                            buffering=FILE_BUFFER_SIZE):
     """
     Split an iterable of JSON serializable rows of data
@@ -173,7 +173,9 @@ def split_file_output_json(filename, dict_list, max_lines=1100,
     :param buffering: number of bytes to buffer files
     :type buffering: int
     """
-    dirname = os.path.dirname(filename)
+    dirname = os.path.abspath(os.path.dirname(filename))
+    if out_dir is None:
+        out_dir = dirname
     basename = os.path.basename(filename)
 
     batches = i_batch(max_lines, dict_list)
@@ -181,7 +183,7 @@ def split_file_output_json(filename, dict_list, max_lines=1100,
     index = count()
     for group in batches:
         dump_dicts_to_json_file(
-            os.path.join(dirname, "{0}_{1}".format(next(index), basename)),
+            os.path.join(out_dir, "{0}_{1}".format(next(index), basename)),
             group,
             buffering=buffering)
 

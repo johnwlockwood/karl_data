@@ -26,6 +26,26 @@ FILE_BUFFER_SIZE = 10485760  # -1  # 419430400
 WALK_SUB_DIR = 0
 WALK_FILES = 2
 
+__all__ = ['dump_dicts_to_json_file',
+           'ensure_dir',
+           'ensure_file_path_dir',
+           'file_path_and_name',
+           'i_get_csv_data',
+           'i_read_buffered_file',
+           'i_read_buffered_text_file',
+           'i_read_buffered_text_file',
+           'i_walk_dir_for_filepaths_names',
+           'i_walk_dir_for_paths_names',
+           'identity',
+           'is_file_csv',
+           'raw_line_reader',
+           'split_csv_file',
+           'split_file',
+           'split_file_output',
+           'split_file_output_csv',
+           'split_file_output_json',
+           'write_as_csv']
+
 
 def ensure_dir(directory):
     """

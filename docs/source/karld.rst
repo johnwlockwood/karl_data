@@ -65,6 +65,22 @@ karld Package
     :undoc-members:
     :show-inheritance:
 
+:mod:`path` Module
+--------------------------
+
+.. automodule:: karld.path
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`io` Module
+--------------------------
+
+.. automodule:: karld.io
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 Subpackages
 -----------
 

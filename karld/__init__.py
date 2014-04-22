@@ -13,3 +13,4 @@ def is_py3():
 from . import io
 from . import conversion_operators
 from . import merger
+from . import path

@@ -45,8 +45,8 @@ csv files which may have multi-line fields to ensure they are not broken up.::
 
 
 When you're generating data and want to shard it out to files based on quantity, use
-one of the split output functions such as `split_file_output_csv`, `split_file_output` or
-`split_file_output_json`::
+one of the split output functions such as ``split_file_output_csv``, ``split_file_output`` or
+``split_file_output_json``::
 
     import os
     import pathlib

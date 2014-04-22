@@ -1,12 +1,12 @@
 How To Data
 ======================
 
-    1.) Split data.
-    2.) Create a generator that will take the data as an iterator, yielding key,value pairs.
-    3.) Sort each list of key/value pairs by the key.
-    4.) Use heap to merge lists of key/value pairs by the key.
-    5.) Group key/value pairs by the key.
-    6.) Reduce each key grouped values to one value yielding a single key/value pair.
+1. Split data.
+2. Create a generator that will take the data as an iterator, yielding key,value pairs.
+3. Sort each list of key/value pairs by the key.
+4. Use heap to merge lists of key/value pairs by the key.
+5. Group key/value pairs by the key.
+6. Reduce each key grouped values to one value yielding a single key/value pair.
 
 In lieu of a key, you may use a key function as long as it produces the
 same key throughout the map-sort-merge-group phases.
@@ -45,8 +45,8 @@ csv files which may have multi-line fields to ensure they are not broken up.::
 
 
 When you're generating data and want to shard it out to files based on quantity, use
-one of the split output functions such as `split_file_output_csv`, `split_file_output` or
-`split_file_output_json`::
+one of the split output functions such as ``split_file_output_csv``, ``split_file_output`` or
+``split_file_output_json``::
 
     import os
     import pathlib

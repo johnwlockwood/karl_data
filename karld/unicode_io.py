@@ -37,7 +37,7 @@ some word with an accent character and it broke and showed
 What do you do?.
 You've tried to write sequences of unicode strings
 to a csv file and gotten
-``UnicodeEncodeError: 'ascii' codec can't encode character u'\xf6' in position 1: ordinal not in range(128)``
+``UnicodeEncodeError: 'ascii' codec can't encode character u'\\xf6' in position 1: ordinal not in range(128)``
 What do you do?
 
 Unicode handles characters used by different languages

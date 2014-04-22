@@ -3,3 +3,4 @@ rednose==0.3
 mock
 coverage
 nose-exclude
+pathlib

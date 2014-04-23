@@ -1,6 +1,11 @@
 from __future__ import print_function
 from itertools import chain
-from itertools import imap
+
+try:
+    from itertools import imap
+except ImportError:
+    # if python 3
+    imap = map
 
 import karld
 

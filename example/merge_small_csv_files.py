@@ -1,8 +1,6 @@
 from __future__ import print_function
 from operator import itemgetter
 
-import pathlib
-
 import karld
 from karld.merger import sort_merge_group
 from karld.path import i_walk_csv_paths
@@ -14,6 +12,7 @@ def main():
     Small means they all together fit in
     your computer's memory.
     """
+    import pathlib
 
     input_dir = pathlib.Path('test_data/things_kinds')
 

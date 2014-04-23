@@ -1,5 +1,3 @@
-import pathlib
-
 import karld
 
 
@@ -7,6 +5,8 @@ def main():
     """
     From a source of data, shard it to csv files.
     """
+    import pathlib
+
     if karld.is_py3():
         third = chr
     else:

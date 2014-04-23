@@ -1,5 +1,4 @@
 import os
-import pathlib
 
 import karld
 
@@ -8,6 +7,7 @@ def main():
     """
     Python 2 version
     """
+    import pathlib
 
     items = (str(x) + os.linesep for x in range(2000))
 

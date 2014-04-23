@@ -72,6 +72,18 @@ Iteratively consume csv file.
     :show-inheritance:
 
 
+:mod:`consume_many_csv_files` Module
+-------------------------------------------
+
+Consume the items of a directory of csv files as if they were
+one file.
+
+.. automodule:: consume_many_csv_files
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
 :mod:`concat_csv_files` Module
 -------------------------------------------
 
@@ -83,13 +95,14 @@ Concatenate all the csv files in a directory together.
     :show-inheritance:
 
 
-:mod:`consume_many_csv_files` Module
+:mod:`merge_small_csv_files` Module
 -------------------------------------------
 
-Consume the items of a directory of csv files as if they were
-one file.
+Merge a number of homogeneous small csv files on a key.
+    Small means they all together fit in
+    your computer's memory.
 
-.. automodule:: consume_many_csv_files
+.. automodule:: merge_small_csv_files
     :members:
     :undoc-members:
     :show-inheritance:

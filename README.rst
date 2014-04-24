@@ -130,9 +130,21 @@ Rows of json serializable data::
         main()
 
 
+Documentation
+===============================
+
+Read the docs: http://karld.readthedocs.org/en/latest/
+
+Expanded Getting Started at http://karld.readthedocs.org/en/latest/getting-started.html.
+
+More examples are documented at http://karld.readthedocs.org/en/latest/source/example.html. View
+the source of the example files, for examples...
+
 
 Contributing:
 ==================
+Submit any issues or questions here: https://github.com/johnwlockwood/karl_data/issues.
+
 Make pull requests to **development** branch of
  https://github.com/johnwlockwood/karl_data.
 
@@ -144,7 +156,3 @@ Check out closed pull requests to see the flow of development, as almost
 every change to master is done via a pull request on **GitHub**. Code Reviews
 are welcome, even on merged Pull Requests. Feel free to ask questions about
 the code.
-
-Documentation
-========================
-Read the docs: http://karld.readthedocs.org/en/latest/

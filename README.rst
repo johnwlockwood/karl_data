@@ -130,6 +130,14 @@ Rows of json serializable data::
         main()
 
 
+Documentation
+===============================
+
+Read the docs: http://karld.readthedocs.org/en/latest/
+
+More examples are documented at http://karld.readthedocs.org/en/latest/source/example.html. View
+the source of the example files, for examples...
+
 
 Contributing:
 ==================
@@ -144,7 +152,3 @@ Check out closed pull requests to see the flow of development, as almost
 every change to master is done via a pull request on **GitHub**. Code Reviews
 are welcome, even on merged Pull Requests. Feel free to ask questions about
 the code.
-
-Documentation
-========================
-Read the docs: http://karld.readthedocs.org/en/latest/

@@ -20,7 +20,7 @@ because it sounds like knarled, but it's knot.
 Examples
 ==============================
 
-Split a csv data file
+Split data
 ++++++++++++++++++++++
 From the example directory available by cloning the repository at https://github.com/johnwlockwood/karl_data.
 
@@ -35,7 +35,7 @@ This will install karld. Then cd into the example directory and run:
 This will read multiline/data.csv and produce split_data_ml and split_data_ml_pipe.
 Run it and compare the input and output. Checkout the source.
 
-Split data
+Split csv files
 ----------------------
 
 Use split_file to split up your data files or use split_csv_file to split up
@@ -94,7 +94,9 @@ one of the split output functions such as ``split_file_output_csv``, ``split_fil
     if __name__ == "__main__":
         main()
 
-CSV serializable data::
+CSV serializable data
+---------------------------
+::
 
     import pathlib
 
@@ -124,7 +126,9 @@ CSV serializable data::
         main()
 
 
-Rows of json serializable data::
+Rows of json serializable data
+------------------------------------
+::
 
     import pathlib
 
@@ -154,7 +158,11 @@ Rows of json serializable data::
         main()
 
 
-Consume the contents of a csv file iteratively.::
+Consume data
+++++++++++++++++++++++
+Consume the contents of a csv file iteratively.
+--------------------------------------------------
+::
 
         from __future__ import print_function
         from operator import itemgetter
@@ -182,3 +190,48 @@ Consume the contents of a csv file iteratively.::
         if __name__ == "__main__":
             main()
 
+
+Consume many csv files iteratively as one stream.
+--------------------------------------------------
+::
+
+        from __future__ import print_function
+        from itertools import chain
+
+        try:
+            from itertools import imap
+        except ImportError:
+            # if python 3
+            imap = map
+
+        import karld
+
+        from karld.path import i_walk_csv_paths
+
+
+        def main():
+            """
+            Consume many csv files as if one.
+            """
+            import pathlib
+
+            input_dir = pathlib.Path('test_data/things_kinds')
+
+            # # Use a generator expression
+            # iterables = (karld.io.i_get_csv_data(data_path)
+            #              for data_path in i_walk_csv_paths(str(input_dir)))
+
+            # # or a generator map.
+            iterables = imap(karld.io.i_get_csv_data,
+                             i_walk_csv_paths(str(input_dir)))
+
+            items = chain.from_iterable(iterables)
+
+            for item in items:
+                print(item[0], item[1])
+
+
+        if __name__ == "__main__":
+            main()
+
+The clean.py example shows processing multiple csv files in parallel.

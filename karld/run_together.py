@@ -24,7 +24,7 @@ def csv_file_to_file(csv_rows_consumer, out_prefix, out_dir, file_path_name):
     as a csv file into out_dir as the same name, lowered, and prefixed.
 
     :param csv_rows_consumer: consumes data_items yielding collection for each
-    :type csv_rows_consumer: function
+    :type csv_rows_consumer: callable
     :param out_prefix: prefix out_file_name
     :type out_prefix: str
     :param out_dir: directory to write output file to

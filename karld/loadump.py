@@ -77,7 +77,8 @@ def i_read_buffered_file(file_name, buffering=FILE_BUFFER_SIZE, binary=True,
     """
     kwargs = dict(buffering=buffering, )
     if is_py3():
-        kwargs.update(dict(encoding=encoding))
+        if not binary:
+            kwargs.update(dict(encoding=encoding))
         if py3_csv_read:
             kwargs.update(dict(newline=''))
 

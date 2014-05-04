@@ -7,7 +7,7 @@ try:
     packages = find_packages()
 except ImportError:
     from distutils.core import setup
-    packages = ['karld', 'karld.tests']
+    packages = ['karld', 'karld.tests', 'karld.record_reader']
 
 from pip.req import parse_requirements
 

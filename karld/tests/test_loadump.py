@@ -17,6 +17,7 @@ from mock import patch
 from nose.plugins.attrib import attr
 
 from karld.loadump import ensure_dir
+from karld.loadump import i_get_unicode_lines
 from karld.loadump import i_walk_dir_for_filepaths_names
 from karld.loadump import is_file_csv
 from karld.merger import sort_merge_group
@@ -111,6 +112,41 @@ def combine_things(iterables):
     for group in grouped_items:
         for item in sorted(group[1]):
             yield item
+
+@attr('integration')
+class TestReadUnicodeLines(unittest.TestCase):
+    """
+    Tests i_get_unicode_lines
+    """
+    def setUp(self):
+        self.input_data_path = os.path.join(os.path.dirname(__file__),
+                                            "test_data",
+                                            "things_kinds",
+                                            "data_0.csv")
+        
+    def test_default_lines_unicode(self):
+        """
+        Ensure entering a file path will produce an iterator
+        of the lines as unicode.
+        """
+        lines = i_get_unicode_lines(self.input_data_path)
+        first = next(lines)
+        second = next(lines)
+
+        self.assertEqual(u'mushroom,fungus\n', first)
+        self.assertEqual(u'tomato,fruit\n', second)
+
+        remaining = list(lines)
+
+        self.assertEqual(u'dróżką,utf-8 sample\n', remaining[2])
+
+    def test_custom_encoding(self):
+        """
+        Ensure trying to encode from ascii on a utf-8 file
+        will cause problems.
+        """
+        lines = i_get_unicode_lines(self.input_data_path, encoding='ascii')
+        self.assertRaises(UnicodeDecodeError, list, lines)
 
 
 @attr('integration')

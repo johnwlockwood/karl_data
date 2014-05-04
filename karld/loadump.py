@@ -1,3 +1,4 @@
+import codecs
 import os
 from os import walk
 import json
@@ -69,14 +70,16 @@ def ensure_file_path_dir(file_path):
 
 
 def i_read_buffered_file(file_name, buffering=FILE_BUFFER_SIZE, binary=True,
-                         py3_csv_read=False):
+                         py3_csv_read=False, encoding='utf-8'):
     """
     Generator of lines of a file name, with buffering for
     speed.
     """
-    kwargs = dict(buffering=buffering)
-    if is_py3() and py3_csv_read:
-        kwargs.update(dict(newline=''))
+    kwargs = dict(buffering=buffering, )
+    if is_py3():
+        kwargs.update(dict(encoding=encoding))
+        if py3_csv_read:
+            kwargs.update(dict(newline=''))
 
     with open(file_name, 'r' + ('b' if binary else 't'), **kwargs) as stream:
         for line in stream:
@@ -85,6 +88,26 @@ def i_read_buffered_file(file_name, buffering=FILE_BUFFER_SIZE, binary=True,
 
 i_read_buffered_text_file = partial(i_read_buffered_file, binary=False)
 i_read_buffered_binary_file = partial(i_read_buffered_file, binary=True)
+
+
+def i_get_unicode_lines(file_name, encoding='utf-8', **kwargs):
+    """
+    A generator for reading a text file as unicode lines.
+
+    :param file_name: Path to file.
+    :param encoding: Encoding of the file.
+    :yields: Lines of the file decoded from encoding to unicode.
+    """
+    buffering = kwargs.get('buffering', FILE_BUFFER_SIZE)
+    read_file_kwargs = dict(buffering=buffering, encoding=encoding)
+
+    stream = i_read_buffered_binary_file(file_name, **read_file_kwargs)
+    if is_py3():
+        for line in stream:
+            yield line
+    else:
+        for line in codecs.iterdecode(stream, encoding, **kwargs):
+            yield line
 
 
 def i_get_csv_data(file_name, *args, **kwargs):

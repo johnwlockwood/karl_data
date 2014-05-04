@@ -14,6 +14,8 @@ def is_log_start_line(line):
 
 def log_reader(file_path):
     """
+    Iterate over request logs as written by a Google App Engine app.
+
     :param file_path: Path to an App Engine log file.
     :returns: An iterator of multi-line log records.
     """

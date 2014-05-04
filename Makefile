@@ -35,12 +35,15 @@ $(BUILD_DIR)/pip-dev.log: requirements_dev.txt
 
 unit: clean
 	nosetests --with-coverage -A 'not integration'
+	nosetests-3.4 --with-coverage -A 'not integration'
 
-integrations:
+integrations: clean
 	nosetests --with-coverage --logging-level=ERROR -A 'integration'
+	nosetests-3.4 --with-coverage --logging-level=ERROR -A 'integration'
 
 testall: clean
 	nosetests --with-coverage
+	nosetests-3.4 --with-coverage
 
 test: clean unit integrations
 

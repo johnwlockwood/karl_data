@@ -100,12 +100,12 @@ def i_get_unicode_lines(file_name, encoding='utf-8', **kwargs):
     """
     buffering = kwargs.get('buffering', FILE_BUFFER_SIZE)
     read_file_kwargs = dict(buffering=buffering, encoding=encoding)
-
-    stream = i_read_buffered_binary_file(file_name, **read_file_kwargs)
     if is_py3():
+        stream = i_read_buffered_text_file(file_name, **read_file_kwargs)
         for line in stream:
             yield line
     else:
+        stream = i_read_buffered_binary_file(file_name, **read_file_kwargs)
         for line in codecs.iterdecode(stream, encoding, **kwargs):
             yield line
 

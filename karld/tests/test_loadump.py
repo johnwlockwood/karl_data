@@ -113,6 +113,7 @@ def combine_things(iterables):
         for item in sorted(group[1]):
             yield item
 
+
 @attr('integration')
 class TestReadUnicodeLines(unittest.TestCase):
     """
@@ -123,7 +124,7 @@ class TestReadUnicodeLines(unittest.TestCase):
                                             "test_data",
                                             "things_kinds",
                                             "data_0.csv")
-        
+
     def test_default_lines_unicode(self):
         """
         Ensure entering a file path will produce an iterator

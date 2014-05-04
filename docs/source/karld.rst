@@ -87,4 +87,5 @@ Subpackages
 .. toctree::
 
     karld.tests
+    karld.record_reader
 

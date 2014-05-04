@@ -1,5 +1,12 @@
+"""
+When your data can be divided into logical units, but is
+each unit takes up varying amounts of multiple lines of
+a file, use this to consume them in those units. Just provide
+a function that takes a line and tells if it's a start line
+or not.
+"""
+
 from collections import deque
-from karld.loadump import i_get_unicode_lines
 
 
 def multi_line_records(lines, is_line_start=None):
@@ -31,23 +38,3 @@ def multi_line_records(lines, is_line_start=None):
     else:
         for line in lines:
             yield deque([line])
-
-
-def is_log_start_line(line):
-    """
-    Is the line the start of a request log from Google App Engine.
-    :param line: A string.
-    :returns: True if the line doesn't start with a tab.
-    """
-    if not line[:1] == u'\t':
-        return True
-
-
-def log_reader(file_path):
-    """
-    :param file_path: Path to an App Engine log file.
-    :returns: An iterator of multi-line log records.
-    """
-    lines = i_get_unicode_lines(file_path)
-
-    return multi_line_records(lines, is_line_start=is_log_start_line)

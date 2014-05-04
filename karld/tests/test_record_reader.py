@@ -3,7 +3,7 @@ from collections import deque
 from itertools import islice
 import unittest
 import os
-from karld.record_reader import log_reader
+from karld.record_reader.app_engine import log_reader
 
 
 class TestMultiLineRecords(unittest.TestCase):

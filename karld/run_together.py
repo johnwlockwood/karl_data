@@ -103,6 +103,7 @@ def pool_run_files_to_files(file_to_file, in_dir, filter_func=None):
     :param in_dir: path to process all files from.
     :param filter_func: Takes a tuple of path and base \
     name of a file and returns a bool.
+    :returns: A list of return values from the map.
     """
     from concurrent.futures import ProcessPoolExecutor
     results = i_walk_dir_for_filepaths_names(in_dir)
@@ -112,7 +113,7 @@ def pool_run_files_to_files(file_to_file, in_dir, filter_func=None):
         results_final = results
 
     with ProcessPoolExecutor() as pool:
-        list(pool.map(file_to_file, results_final))
+        return list(pool.map(file_to_file, results_final))
 
 
 def serial_run_files_to_files(file_to_file, in_dir, filter_func=None):
@@ -126,6 +127,7 @@ def serial_run_files_to_files(file_to_file, in_dir, filter_func=None):
     :param in_dir: path to process all files from.
     :param filter_func: Takes a tuple of path and base \
     name of a file and returns a bool.
+    :returns: A list of return values from the map.
     """
     results = i_walk_dir_for_filepaths_names(in_dir)
     if filter_func:
@@ -133,4 +135,4 @@ def serial_run_files_to_files(file_to_file, in_dir, filter_func=None):
     else:
         results_final = results
 
-    list(map(file_to_file, results_final))
+    return list(map(file_to_file, results_final))

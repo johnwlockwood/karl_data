@@ -5,7 +5,7 @@ from karld.record_reader import multi_line_records
 def is_log_start_line(line):
     """
     Is the line the start of a request log from Google App Engine.
-    
+
     :param line: A string.
     :returns: True if the line doesn't start with a tab.
     """

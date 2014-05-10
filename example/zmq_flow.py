@@ -11,15 +11,10 @@ def ventilator():
     ventilator_send = context.socket(zmq.PUSH)
     ventilator_send.bind("tcp://127.0.0.1:5557")
 
-    # Give everything a second to spin up and connect
-    time.sleep(1)
-
-    # Send the numbers between 1 and ten thousand as work messages
+    # Send the numbers between 1 and 1 million as work messages
     for num in range(10000):
         work_message = { 'num': num }
         ventilator_send.send_json(work_message)
-
-    time.sleep(1)
 
 
 def worker(wrk_num):
@@ -30,7 +25,7 @@ def worker(wrk_num):
     work_receiver = context.socket(zmq.PULL)
     work_receiver.connect("tcp://127.0.0.1:5557")
 
-    # Set up a channel to send result of work to results reporter
+    # Set up a channel to send result of work to the results reporter
     results_sender = context.socket(zmq.PUSH)
     results_sender.connect("tcp://127.0.0.1:5558")
 
@@ -82,15 +77,14 @@ def result_manager():
         print "Worker {} answered: {}".format(results_message['worker'],
                                               results_message['result'])
 
-        # Signal to all workers that we are finished
-        control_sender.send("FINISHED")
-        time.sleep(5)
+    # Signal to all workers that we are finished
+    control_sender.send("FINISHED")
 
 
 if __name__ == "__main__":
 
     # Create a pool of workers to distribute work to
-    worker_pool = range(10)
+    worker_pool = range(8)
     for wrk_num in range(len(worker_pool)):
         Process(target=worker, args=(wrk_num,)).start()
 

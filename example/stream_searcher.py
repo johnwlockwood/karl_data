@@ -33,7 +33,7 @@ def get_metal(item):
         return item[0]
 
 
-def information_tap(data_items):
+def certain_kind_tap(data_items):
     """
     As the stream of data items go by, get different
     kinds of information from them, in this case,
@@ -83,7 +83,7 @@ def run(in_dir, pool):
 
     results = files_to_files_runner(
         partial(csv_file_consumer,
-                information_tap),
+                certain_kind_tap),
         in_dir, filter_func=is_file_csv)
 
     fruit_results = []
@@ -109,19 +109,19 @@ def main(*args):
     """
     Try it::
 
-        python spigot_searcher.py
+        python stream_searcher.py
 
     or::
 
-        python spigot_searcher.py --pool True
+        python stream_searcher.py --pool True
 
     or::
 
-        python spigot_searcher.py --in-dir test_data/things_kinds
+        python stream_searcher.py --in-dir test_data/things_kinds
 
     or::
 
-        python spigot_searcher.py --pool True --in-dir test_data/things_kinds
+        python stream_searcher.py --pool True --in-dir test_data/things_kinds
     """
     parser = argparse.ArgumentParser(*args)
     parser.add_argument("--in-dir",

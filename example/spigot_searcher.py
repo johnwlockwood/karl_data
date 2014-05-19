@@ -29,19 +29,19 @@ def get_metal(item):
 
 def information_tap(data_items):
     """
-    As the stream of data items go by get different
-    kinds of information from them, in this case
+    As the stream of data items go by, get different
+    kinds of information from them, in this case,
     the things that are fruit and metal, collecting
     each kind with a different spigot.
 
-    stream_tap doesn't consume the iterator(data_items)
+    stream_tap doesn't consume the data_items iterator
     by itself, it's a generator and must be consumed
     by something else. In this case, it's consuming
     the items by casting the iterator to a tuple,
     but doing it in batches.
 
     Since each batch is not referenced by anything
-    the garbage collector is free to free the memory,
+    the memory can be freed by the garbage collector,
     so no matter the size of the data_items, only a little
     memory is needed. The only things retained
     are the results, which should just be a subset

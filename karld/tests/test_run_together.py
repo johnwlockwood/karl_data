@@ -58,3 +58,34 @@ class TestCSVFileToFile(unittest.TestCase):
 
         if os.path.exists(expected_file):
             os.remove(expected_file)
+
+    @attr('integration')
+    def test_csv_file_consumer(self):
+        """
+        Ensure csv_file_consumer calls it's csv_rows_consumer
+        with the csv rows from the file.
+        """
+        from ..run_together import csv_file_consumer
+        from karld.loadump import file_path_and_name
+
+        input_path = os.path.join(os.path.dirname(__file__),
+                                  "test_data",
+                                  "things_kinds")
+
+        def combiner(items):
+            return tuple(items)
+
+        results = csv_file_consumer(combiner, file_path_and_name(
+            input_path, "data_0.csv"))
+
+        self.assertEqual(([u'mushroom', u'fungus'],
+                         [u'tomato', u'fruit'],
+                         [u'topaz', u'mineral'],
+                         [u'iron', u'metal'],
+                         [u'dr\xf3\u017ck\u0105', u'utf-8 sample'],
+                         [u'apple', u'fruit'],
+                         [u'cheese', u'dairy'],
+                         [u'peach', u'fruit'],
+                         [u'celery', u'vegetable']), results)
+
+

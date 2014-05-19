@@ -81,6 +81,14 @@ karld Package
     :undoc-members:
     :show-inheritance:
 
+:mod:`tap` Module
+--------------------------
+
+.. automodule:: karld.tap
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 Subpackages
 -----------
 

@@ -13,16 +13,22 @@ from karld.loadump import is_file_csv
 from karld.run_together import csv_file_consumer
 from karld.run_together import pool_run_files_to_files
 from karld.run_together import serial_run_files_to_files
-from karld.tap import Spigot
+from karld.tap import Bucket
 from karld.tap import stream_tap
 
 
 def get_fruit(item):
+    """Get things that are fruit.
+
+    :returns: thing of item if it's a fruit"""
     if len(item) == 2 and item[1] == u"fruit":
         return item[0]
 
 
 def get_metal(item):
+    """Get things that are metal.
+
+    :returns: thing of item if it's metal"""
     if len(item) == 2 and item[1] == u"metal":
         return item[0]
 
@@ -51,15 +57,15 @@ def information_tap(data_items):
 
     :param data_items: A sequence of unicode strings
     """
-    fruit_spigot = Spigot(get_fruit)
-    metal_spigot = Spigot(get_metal)
+    fruit_spigot = Bucket(get_fruit)
+    metal_spigot = Bucket(get_metal)
 
     items = stream_tap((fruit_spigot, metal_spigot), data_items)
 
     for batch in i_batch(100, items):
         tuple(batch)
 
-    return fruit_spigot.results(), metal_spigot.results()
+    return fruit_spigot.contents(), metal_spigot.contents()
 
 
 def run(in_dir, pool):

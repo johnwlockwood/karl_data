@@ -1,3 +1,4 @@
+from collections import deque
 from functools import partial
 
 try:
@@ -15,6 +16,22 @@ from .loadump import ensure_dir
 from .loadump import i_get_csv_data
 from .loadump import i_walk_dir_for_filepaths_names
 from .loadump import write_as_csv
+
+
+def csv_file_consumer(csv_rows_consumer, file_path_name):
+    """
+    Consume the file at file_path_name as a csv file, passing
+    it through csv_rows_consumer.
+
+    :param csv_rows_consumer: consumes data_items yielding collection for each
+    :type csv_rows_consumer: callable
+    :param file_path_name: path to input csv file
+    :type file_path_name: str, str
+
+    """
+    data_path, data_file_name = file_path_name
+    data_items = i_get_csv_data(data_path)
+    return csv_rows_consumer(data_items)
 
 
 def csv_file_to_file(csv_rows_consumer, out_prefix, out_dir, file_path_name):

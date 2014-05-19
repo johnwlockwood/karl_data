@@ -5,12 +5,20 @@ from karld.tap import stream_tap
 
 
 def get_odd(item):
+    """Get odd items.
+    
+    :returns: item if it is odd."""
     if item%2 != 0:
         return item
 
+
 def get_company_crowd(item):
+    """Get string based upon item if it is greater than two.
+    
+    :returns: A string if item is greater or equal to three."""
     if item >= 3:
         return "{} >= 3".format(item)
+
 
 class TestTap(unittest.TestCase):
     def setUp(self):

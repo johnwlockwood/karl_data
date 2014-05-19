@@ -106,3 +106,15 @@ Merge a number of homogeneous small csv files on a key.
     :members:
     :undoc-members:
     :show-inheritance:
+
+
+:mod:`stream_searcher` Module
+-------------------------------------------
+
+Uses tap to get information from a stream
+of data in files.
+
+.. automodule:: stream_searcher
+    :members:
+    :undoc-members:
+    :show-inheritance:

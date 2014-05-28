@@ -10,11 +10,12 @@ except ImportError:
 
 import os
 
-from karld.iter_utils import yield_nth_of
+from karld.iter_utils import yield_nth_of, i_batch
 
 from .loadump import ensure_dir
 from .loadump import i_get_csv_data
 from .loadump import i_walk_dir_for_filepaths_names
+from .loadump import i_read_buffered_binary_file
 from .loadump import write_as_csv
 
 
@@ -131,6 +132,31 @@ def pool_run_files_to_files(file_to_file, in_dir, filter_func=None):
 
     with ProcessPoolExecutor() as pool:
         return list(pool.map(file_to_file, results_final))
+
+
+def distribute_run_to_runners(items_func, in_url, reader=None):
+    """
+    With a multi-process pool, map batches of items from
+    file to an items processing function.
+
+    The reader callable should be as fast as possible to
+    reduce data feeder cpu usage. It should do the minimal
+    to produce discrete units of data, save any decoding
+    for the items function.
+
+    :param items_func: Callable that takes multiple items of the data.
+    :param reader: URL reader callable.
+    :param in_url: Url of content
+    """
+    from concurrent.futures import ProcessPoolExecutor
+    if not reader:
+        reader = i_read_buffered_binary_file
+
+    stream = reader(in_url)
+    batches = i_batch(1100, stream)
+
+    with ProcessPoolExecutor() as pool:
+        return list(pool.map(items_func, batches))
 
 
 def serial_run_files_to_files(file_to_file, in_dir, filter_func=None):

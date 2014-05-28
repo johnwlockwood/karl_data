@@ -13,6 +13,7 @@ from karld.loadump import is_file_csv
 from karld.run_together import csv_file_consumer
 from karld.run_together import pool_run_files_to_files
 from karld.run_together import serial_run_files_to_files
+from karld.run_together import distribute_run_to_runners
 from karld.tap import Bucket
 from karld.tap import stream_tap
 
@@ -85,6 +86,44 @@ def run(in_dir, pool):
         partial(csv_file_consumer,
                 certain_kind_tap),
         in_dir, filter_func=is_file_csv)
+
+    fruit_results = []
+    metal_results = []
+
+    for fruits, metals in results:
+        for fruit in fruits:
+            fruit_results.append(fruit)
+
+        for metal in metals:
+            metal_results.append(metal)
+
+    print("=== fruits ===")
+    for fruit in fruit_results:
+        print(fruit)
+
+    print("=== metals ===")
+    for metal in metal_results:
+        print(metal)
+
+
+def run_distribute(in_path):
+    """
+    Run the composition of csv_file_consumer and information tap
+    with the csv files in the input directory, and collect
+    the results from each file and merge them together,
+    printing both kinds of results.
+    """
+    files_to_files_runner = serial_run_files_to_files
+
+    if pool:
+        print("multi-processing")
+        files_to_files_runner = pool_run_files_to_files
+
+    results = distribute_run_to_runners(
+        certain_kind_tap,
+        in_path
+        partial(csv_file_consumer,
+                certain_kind_tap))
 
     fruit_results = []
     metal_results = []

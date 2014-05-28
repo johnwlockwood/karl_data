@@ -126,6 +126,18 @@ def i_get_csv_data(file_name, *args, **kwargs):
         yield row
 
 
+def i_get_json_data(file_name, *args, **kwargs):
+    """A generator for reading file with json documents
+    delimited by newlines.
+    """
+    buffering = kwargs.get('buffering', FILE_BUFFER_SIZE)
+    read_file_kwargs = dict(buffering=buffering)
+    data = i_read_buffered_file(file_name, **read_file_kwargs)
+
+    for row in data:
+        yield json.loads(row)
+
+
 def write_as_csv(items, file_name, append=False,
                  line_buffer_size=None, buffering=FILE_BUFFER_SIZE,
                  get_csv_row_writer=get_csv_row_writer):

@@ -15,6 +15,7 @@ from karld.run_together import csv_file_consumer
 from karld.run_together import pool_run_files_to_files
 from karld.run_together import serial_run_files_to_files
 from karld.run_together import distribute_run_to_runners
+from karld.run_together import distribute_multi_run_to_runners
 from karld.tap import Bucket
 from karld.tap import stream_tap
 
@@ -138,6 +139,37 @@ def run_distribute(in_path):
         print(metal)
 
 
+def run_distribute_multi(in_dir):
+    """
+    Run the composition of csv_file_consumer and information tap
+    with the csv files in the input directory, and collect
+    the results from each file and merge them together,
+    printing both kinds of results.
+    """
+
+    results = distribute_multi_run_to_runners(
+        certain_kind_tap,
+        in_dir, reader=i_get_csv_data, batch_size=3, filter_func=is_file_csv)
+
+    fruit_results = []
+    metal_results = []
+
+    for fruits, metals in results:
+        for fruit in fruits:
+            fruit_results.append(fruit)
+
+        for metal in metals:
+            metal_results.append(metal)
+
+    print("=== fruits ===")
+    for fruit in fruit_results:
+        print(fruit)
+
+    print("=== metals ===")
+    for metal in metal_results:
+        print(metal)
+
+
 def main(*args):
     """
     Try it::
@@ -169,7 +201,8 @@ def main(*args):
     if args.in_file:
         run_distribute(args.in_file)
     else:
-        run(args.in_dir, args.pool)
+        run_distribute_multi(args.in_dir)
+        # run(args.in_dir, args.pool)
 
 
 if __name__ == "__main__":

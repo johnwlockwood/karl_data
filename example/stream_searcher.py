@@ -10,6 +10,7 @@ if is_py3():
     unicode = str
 
 from karld.loadump import is_file_csv
+from karld.loadump import i_get_csv_data
 from karld.run_together import csv_file_consumer
 from karld.run_together import pool_run_files_to_files
 from karld.run_together import serial_run_files_to_files
@@ -113,17 +114,10 @@ def run_distribute(in_path):
     the results from each file and merge them together,
     printing both kinds of results.
     """
-    files_to_files_runner = serial_run_files_to_files
-
-    if pool:
-        print("multi-processing")
-        files_to_files_runner = pool_run_files_to_files
 
     results = distribute_run_to_runners(
         certain_kind_tap,
-        in_path
-        partial(csv_file_consumer,
-                certain_kind_tap))
+        in_path, reader=i_get_csv_data, batch_size=3)
 
     fruit_results = []
     metal_results = []
@@ -166,10 +160,16 @@ def main(*args):
     parser.add_argument("--in-dir",
                         default=os.path.join("test_data", "things_kinds"),
                         help="Data source directory")
+    parser.add_argument("--in-file",
+                        default=None,
+                        help="Data source file")
     parser.add_argument("--pool", default=False)
     args = parser.parse_args()
 
-    run(args.in_dir, args.pool)
+    if args.in_file:
+        run_distribute(args.in_file)
+    else:
+        run(args.in_dir, args.pool)
 
 
 if __name__ == "__main__":

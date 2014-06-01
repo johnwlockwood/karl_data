@@ -2,7 +2,7 @@ from collections import deque
 from functools import partial
 
 try:
-    from itertools import ifilter
+    from itertools import ifilter, chain
     from itertools import imap
 except ImportError:
     imap = map
@@ -134,7 +134,7 @@ def pool_run_files_to_files(file_to_file, in_dir, filter_func=None):
         return list(pool.map(file_to_file, results_final))
 
 
-def distribute_run_to_runners(items_func, in_url, reader=None):
+def distribute_run_to_runners(items_func, in_url, reader=None, batch_size=1100):
     """
     With a multi-process pool, map batches of items from
     file to an items processing function.
@@ -147,13 +147,50 @@ def distribute_run_to_runners(items_func, in_url, reader=None):
     :param items_func: Callable that takes multiple items of the data.
     :param reader: URL reader callable.
     :param in_url: Url of content
+    :param batch_size: size of batches.
     """
     from concurrent.futures import ProcessPoolExecutor
     if not reader:
         reader = i_read_buffered_binary_file
 
     stream = reader(in_url)
-    batches = i_batch(1100, stream)
+    batches = i_batch(batch_size, stream)
+
+    with ProcessPoolExecutor() as pool:
+        return list(pool.map(items_func, batches))
+
+
+def distribute_multi_run_to_runners(items_func, in_dir,
+                                    reader=None,
+                                    batch_size=1100,
+                                    filter_func=None):
+    """
+    With a multi-process pool, map batches of items from
+    file to an items processing function.
+
+    The reader callable should be as fast as possible to
+    reduce data feeder cpu usage. It should do the minimal
+    to produce discrete units of data, save any decoding
+    for the items function.
+
+    :param items_func: Callable that takes multiple items of the data.
+    :param reader: URL reader callable.
+    :param in_url: Url of content
+    :param batch_size: size of batches.
+    """
+    from concurrent.futures import ProcessPoolExecutor
+    if not reader:
+        reader = i_read_buffered_binary_file
+
+    results = i_walk_dir_for_filepaths_names(in_dir)
+    if filter_func:
+        results_final = ifilter(filter_func, results)
+    else:
+        results_final = results
+
+    stream = chain.from_iterable(
+        (reader(in_url) for in_url, name in results_final))
+    batches = i_batch(batch_size, stream)
 
     with ProcessPoolExecutor() as pool:
         return list(pool.map(items_func, batches))

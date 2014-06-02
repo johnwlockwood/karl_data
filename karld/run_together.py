@@ -124,6 +124,7 @@ def pool_run_files_to_files(file_to_file, in_dir, filter_func=None):
     :returns: A list of return values from the map.
     """
     from concurrent.futures import ProcessPoolExecutor
+
     results = i_walk_dir_for_filepaths_names(in_dir)
     if filter_func:
         results_final = ifilter(filter_func, results)
@@ -150,6 +151,7 @@ def distribute_run_to_runners(items_func, in_url, reader=None, batch_size=1100):
     :param batch_size: size of batches.
     """
     from concurrent.futures import ProcessPoolExecutor
+
     if not reader:
         reader = i_read_buffered_binary_file
 
@@ -179,22 +181,26 @@ def distribute_multi_run_to_runners(items_func, in_dir,
     :param batch_size: size of batches.
     """
     from concurrent.futures import ProcessPoolExecutor
+    from multiprocessing import cpu_count
+
     if not reader:
         reader = i_read_buffered_binary_file
 
-    results = i_walk_dir_for_filepaths_names(in_dir)
+    paths_names = i_walk_dir_for_filepaths_names(in_dir)
     if filter_func:
-        results_final = ifilter(filter_func, results)
+        paths_names_final = ifilter(filter_func, paths_names)
     else:
-        results_final = results
+        paths_names_final = paths_names
 
     stream = chain.from_iterable(
-        (reader(in_url) for in_url, name in results_final))
+        (reader(in_url) for in_url, name in paths_names_final))
     batches = i_batch(batch_size, stream)
 
     with ProcessPoolExecutor() as pool:
-        return list(pool.map(items_func, batches))
-
+        return list(chain.from_iterable(
+            (list(pool.map(items_func, batch))
+             for batch in i_batch(cpu_count() * 2, batches))
+        ))
 
 def serial_run_files_to_files(file_to_file, in_dir, filter_func=None):
     """

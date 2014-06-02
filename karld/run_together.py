@@ -1,5 +1,5 @@
-from collections import deque
 from functools import partial
+from operator import methodcaller
 
 try:
     from itertools import ifilter, chain
@@ -196,11 +196,21 @@ def distribute_multi_run_to_runners(items_func, in_dir,
         (reader(in_url) for in_url, name in paths_names_final))
     batches = i_batch(batch_size, stream)
 
-    with ProcessPoolExecutor() as pool:
-        return list(chain.from_iterable(
-            (list(pool.map(items_func, batch))
-             for batch in i_batch(cpu_count() * 2, batches))
-        ))
+    n_cpus = cpu_count()
+    max_workers = (n_cpus-1) or 1
+    max_in_queue = int(n_cpus * 1.5)
+    with ProcessPoolExecutor(max_workers=max_workers) as pool:
+        futures = []
+        while True:
+            if len(pool._pending_work_items) < max_in_queue:
+                try:
+                    batch = next(batches)
+                    futures.append(pool.submit(items_func, batch))
+                except StopIteration:
+                    break
+
+    return list(imap(methodcaller('result'), futures))
+
 
 def serial_run_files_to_files(file_to_file, in_dir, filter_func=None):
     """

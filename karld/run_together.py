@@ -209,7 +209,15 @@ def distribute_multi_run_to_runners(items_func, in_dir,
                 except StopIteration:
                     break
 
-    return imap(methodcaller('result'), futures)
+    def dones():
+        while futures:
+            for index, future in enumerate(futures):
+                if future.done():
+                    yield future.result()
+                    del futures[index]
+                    break
+
+    return dones()
 
 
 def serial_run_files_to_files(file_to_file, in_dir, filter_func=None):

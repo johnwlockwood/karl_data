@@ -179,6 +179,7 @@ def distribute_multi_run_to_runners(items_func, in_dir,
     :param reader: URL reader callable.
     :param in_url: Url of content
     :param batch_size: size of batches.
+    :param filter_func: a function that returns True for desired paths names.
     """
     from concurrent.futures import ProcessPoolExecutor
     from multiprocessing import cpu_count
@@ -209,7 +210,10 @@ def distribute_multi_run_to_runners(items_func, in_dir,
                 except StopIteration:
                     break
 
-    def dones():
+    def results():
+        """Generator that yield results of futures
+        that are done. If not done yet, it skips it.
+        """
         while futures:
             for index, future in enumerate(futures):
                 if future.done():
@@ -217,7 +221,7 @@ def distribute_multi_run_to_runners(items_func, in_dir,
                     del futures[index]
                     break
 
-    return dones()
+    return results()
 
 
 def serial_run_files_to_files(file_to_file, in_dir, filter_func=None):

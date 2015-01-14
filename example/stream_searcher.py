@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# _*_ coding: utf-8 _*_
 import argparse
 from functools import partial
 import os
@@ -195,14 +197,19 @@ def main(*args):
     parser.add_argument("--in-file",
                         default=None,
                         help="Data source file")
-    parser.add_argument("--pool", default=False)
+    parser.add_argument("--single", help="Use a single process. "
+                                         "Helpful for debugging")
     args = parser.parse_args()
 
     if args.in_file:
+        print("file")
         run_distribute(args.in_file)
+    elif args.single:
+        print("single")
+        run(args.in_dir, False)
     else:
+        print("multi")
         run_distribute_multi(args.in_dir)
-        # run(args.in_dir, args.pool)
 
 
 if __name__ == "__main__":

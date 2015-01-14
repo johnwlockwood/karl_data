@@ -2,7 +2,8 @@ from functools import partial
 from operator import methodcaller
 
 try:
-    from itertools import ifilter, chain
+    from itertools import chain
+    from itertools import ifilter
     from itertools import imap
 except ImportError:
     imap = map
@@ -10,7 +11,8 @@ except ImportError:
 
 import os
 
-from karld.iter_utils import yield_nth_of, i_batch
+from karld.iter_utils import i_batch
+from karld.iter_utils import yield_nth_of
 
 from .loadump import ensure_dir
 from .loadump import i_get_csv_data

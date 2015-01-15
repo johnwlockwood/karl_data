@@ -1,5 +1,6 @@
 import os
 import sys
+import uuid
 
 try:
     from setuptools import find_packages
@@ -36,7 +37,7 @@ def get_version():
 
 
 def get_requirements(filename):
-    reqs = parse_requirements(filename)
+    reqs = parse_requirements(filename, session=uuid.uuid1())
 
     return [str(r.req) for r in reqs]
 

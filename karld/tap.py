@@ -47,3 +47,30 @@ def stream_tap(callables, stream):
         for caller in callables:
             caller(item)
         yield item
+
+
+def cooperative_accumulation_handler(stopped_generator, spigot):
+    """
+    Drain the contents of the bucket from the spigot.
+
+    :param stopped_generator: Generator which as stopped
+    :param spigot: a Bucket.
+    :return: The contents of the bucket.
+    """
+    return spigot.drain_contents()
+
+
+def cooperative_accumulate(a_generator_func):
+    """
+    Start a Deferred whose callBack arg is a deque of the accumulation
+    of the values yielded from a_generator_func.
+
+    :param a_generator_func: A function which returns a generator.
+    :return:
+    """
+    from twisted.internet.task import cooperate
+    spigot = Bucket(lambda x: x)
+    items = stream_tap((spigot,), a_generator_func())
+    d = cooperate(items).whenDone()
+    d.addCallback(cooperative_accumulation_handler, spigot)
+    return d

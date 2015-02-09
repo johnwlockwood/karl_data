@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # _*_ coding: utf-8 _*_
 import argparse
 from functools import partial
@@ -167,7 +167,7 @@ def run_distribute_multi(in_dir):
     for fruit in fruit_results:
         print(fruit)
 
-    print("=== metals ===")
+    print("=== metals 䤗 ===")
     for metal in metal_results:
         print(metal)
 

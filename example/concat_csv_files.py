@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# _*_ coding: utf-8 _*_
+
 from __future__ import print_function
 from itertools import ifilter
 from itertools import chain

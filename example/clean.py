@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# _*_ coding: utf-8 _*_
+
 import argparse
 from functools import partial
 from itertools import chain

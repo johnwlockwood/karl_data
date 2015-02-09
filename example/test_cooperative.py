@@ -7,6 +7,7 @@ from twisted.internet import defer
 from twisted.trial import unittest
 
 from karld.tap import cooperative_accumulate
+from karld.tap import cooperative_accumulate_batched
 
 from cooperative_multitasking import and_the_winner_is2
 from cooperative_multitasking import i_get_tenth_11
@@ -173,3 +174,73 @@ class TestWinner(unittest.TestCase):
         #   to cooperate.
         self.assertEqual(called,
                          [10, 25, 1108, 155, 11, 26, 1109, 156, 1108, 1109])
+
+    @defer.inlineCallbacks
+    def test_multi_deux_batched(self):
+        """
+        Ensure multiple inline callback functions will run cooperatively.
+
+        Ensure the result of gatherResults can be chained together
+        in order.
+
+        Ensure cooperatively run generators will complete
+        no matter the length.
+
+        Ensure the longest one will continue to iterate after the
+        others run out of iterations.
+
+        Ensure those called with cooperative_accumulate_batched will
+        iterate over the generator in batches the size of max_size.
+
+        :return:
+        """
+        called = []
+
+        def watcher(value):
+            """
+            A pass through generator for i_get_tenth_11 that
+            captures the value in a list, which can show the
+            order of the generator iteration.
+
+            :param value:
+            :return:
+            """
+            for item in i_get_tenth_11(value):
+                called.append(item)
+                yield item
+
+        def deux_watcher(value):
+            """
+            A pass through generator for i_get_tenth_11 that
+            captures the value in a list, which can show the
+            order of the generator iteration.
+
+            :param value:
+            :return:
+            """
+            for item in i_get_tenth_11(value):
+                called.append(item)
+                yield item
+            for item in i_get_tenth_11(value):
+                called.append(item)
+                yield item
+
+        result = yield defer.gatherResults([
+            cooperative_accumulate(partial(watcher, list(range(0, 15)))),
+            cooperative_accumulate(partial(watcher, list(range(15, 100)))),
+            cooperative_accumulate_batched(3, partial(deux_watcher,
+                                           list(range(1098, 10200)))),
+            cooperative_accumulate(partial(watcher, list(range(145, 189))))
+        ])
+
+        final_result = list(chain.from_iterable(result))
+
+        self.assertEqual(final_result,
+                         [10, 11, 25, 26, 1108, 1109, 1108, 1109, 155, 156])
+        self.assertEqual(set(called), set(final_result))
+        self.assertNotEqual(called, final_result)
+        #  The iteration is shown to alternate between generators passed
+        #   to cooperate, except the batched one does three at a time
+        #   when it is it's turn.
+        self.assertEqual(called,
+                         [10, 25, 1108, 1109, 1108, 155, 11, 26, 1109, 156])

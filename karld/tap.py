@@ -1,4 +1,5 @@
 from collections import deque
+from karld.iter_utils import i_batch
 
 
 class Bucket(object):
@@ -72,5 +73,28 @@ def cooperative_accumulate(a_generator_func):
     spigot = Bucket(lambda x: x)
     items = stream_tap((spigot,), a_generator_func())
     d = cooperate(items).whenDone()
+    d.addCallback(cooperative_accumulation_handler, spigot)
+    return d
+
+
+def cooperative_accumulate_batched(max_batch_size, a_generator_func):
+    """
+    Start a Deferred whose callBack arg is a deque of the accumulation
+    of the values yielded from a_generator_func which is iterated over
+    in batches the size of max_batch_size.
+
+    It should be more efficient to iterate over the generator in
+     batches and still provide enough speed for non-blocking execution.
+
+    :param max_batch_size: The number of iterations of the generator
+     to consume at a time.
+    :param a_generator_func: A function which returns a generator.
+    :return:
+    """
+    from twisted.internet.task import cooperate
+    spigot = Bucket(lambda x: x)
+    items = stream_tap((spigot,), a_generator_func())
+
+    d = cooperate(i_batch(max_batch_size, items)).whenDone()
     d.addCallback(cooperative_accumulation_handler, spigot)
     return d

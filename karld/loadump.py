@@ -40,6 +40,7 @@ __all__ = ['dump_dicts_to_json_file',
            'i_walk_dir_for_paths_names',
            'identity',
            'is_file_csv',
+           'is_file_json',
            'raw_line_reader',
            'split_csv_file',
            'split_file',
@@ -189,7 +190,18 @@ def is_file_csv(file_path_name):
     return file_name[-4:].lower() == '.csv'
 
 
-def dump_dicts_to_json_file(file_name, dicts, buffering=FILE_BUFFER_SIZE):
+def is_file_json(file_path_name):
+    """
+    Is the file a json file? Identify by extension.
+
+    :param file_path_name:
+    :type file_path_name: str
+    """
+    _, file_name = file_path_name
+    return file_name[-5:].lower() == '.json'
+
+
+def dump_dicts_to_json_file(dicts, file_name, buffering=FILE_BUFFER_SIZE):
     """writes each dictionary in the dicts iterable
     to a line of the file as json.
 
@@ -220,8 +232,8 @@ def split_file_output_json(filename, dict_list, out_dir=None, max_lines=1100,
     index = count()
     for group in batches:
         dump_dicts_to_json_file(
-            os.path.join(out_dir, "{0}_{1}".format(next(index), basename)),
             group,
+            os.path.join(out_dir, "{0}_{1}".format(next(index), basename)),
             buffering=buffering)
 
 

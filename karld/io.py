@@ -6,6 +6,9 @@ from .loadump import ensure_file_path_dir
 from .loadump import i_get_csv_data
 from .loadump import is_file_csv
 
+from .loadump import i_get_json_data
+from .loadump import is_file_json
+
 from .loadump import raw_line_reader
 
 from .loadump import split_csv_file

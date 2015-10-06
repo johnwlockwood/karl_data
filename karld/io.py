@@ -19,3 +19,4 @@ from .loadump import split_file_output_csv
 from .loadump import split_file_output_json
 
 from .loadump import write_as_csv
+from .loadump import write_as_json

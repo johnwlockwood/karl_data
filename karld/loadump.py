@@ -47,7 +47,8 @@ __all__ = ['dump_dicts_to_json_file',
            'split_file_output',
            'split_file_output_csv',
            'split_file_output_json',
-           'write_as_csv']
+           'write_as_csv',
+           'write_as_json']
 
 
 def ensure_dir(directory):
@@ -201,16 +202,31 @@ def is_file_json(file_path_name):
     return file_name[-5:].lower() == '.json'
 
 
-def dump_dicts_to_json_file(dicts, file_name, buffering=FILE_BUFFER_SIZE):
+def write_as_json(items, file_name, buffering=FILE_BUFFER_SIZE):
     """writes each dictionary in the dicts iterable
     to a line of the file as json.
 
+    :param items: A sequence of json dumpable objects.
+    :param file_name: the path of the output file.
     :param buffering: number of bytes to buffer files
     :type buffering: int
     """
     with open(file_name, 'w+', buffering=buffering) as json_file:
-        for item in dicts:
+        for item in items:
             json_file.write(json.dumps(item) + os.linesep)
+
+
+def dump_dicts_to_json_file(file_name, dicts, buffering=FILE_BUFFER_SIZE):
+    """writes each dictionary in the dicts iterable
+    to a line of the file as json.
+
+    NOTE: Deprecated. replaced by write_as_json, to match the signature
+     of write_to_csv.
+
+    :param buffering: number of bytes to buffer files
+    :type buffering: int
+    """
+    return write_as_json(dicts, file_name, buffering=buffering)
 
 
 def split_file_output_json(filename, dict_list, out_dir=None, max_lines=1100,
@@ -231,7 +247,7 @@ def split_file_output_json(filename, dict_list, out_dir=None, max_lines=1100,
 
     index = count()
     for group in batches:
-        dump_dicts_to_json_file(
+        write_as_json(
             group,
             os.path.join(out_dir, "{0}_{1}".format(next(index), basename)),
             buffering=buffering)

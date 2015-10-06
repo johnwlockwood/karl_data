@@ -166,11 +166,12 @@ def distribute_run_to_runners(items_func, in_url, reader=None, batch_size=1100):
 
 def distribute_multi_run_to_runners(items_func, in_dir,
                                     reader=None,
+                                    walker=None,
                                     batch_size=1100,
                                     filter_func=None):
     """
     With a multi-process pool, map batches of items from
-    file to an items processing function.
+    multiple files to an items processing function.
 
     The reader callable should be as fast as possible to
     reduce data feeder cpu usage. It should do the minimal
@@ -179,7 +180,8 @@ def distribute_multi_run_to_runners(items_func, in_dir,
 
     :param items_func: Callable that takes multiple items of the data.
     :param reader: URL reader callable.
-    :param in_url: Url of content
+    :param walker: A generator that takes the in_dir URL and emits
+     url, name tuples.
     :param batch_size: size of batches.
     :param filter_func: a function that returns True for desired paths names.
     """
@@ -189,7 +191,10 @@ def distribute_multi_run_to_runners(items_func, in_dir,
     if not reader:
         reader = i_read_buffered_binary_file
 
-    paths_names = i_walk_dir_for_filepaths_names(in_dir)
+    if not walker:
+        walker = i_walk_dir_for_filepaths_names
+
+    paths_names = walker(in_dir)
     if filter_func:
         paths_names_final = ifilter(filter_func, paths_names)
     else:

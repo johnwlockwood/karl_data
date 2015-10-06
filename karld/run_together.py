@@ -11,8 +11,8 @@ except ImportError:
 
 import os
 
-from karld.iter_utils import i_batch
-from karld.iter_utils import yield_nth_of
+from iter_karld_tools import i_batch
+from iter_karld_tools import yield_nth_of
 
 from .loadump import ensure_dir
 from .loadump import i_get_csv_data

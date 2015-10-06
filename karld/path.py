@@ -1,4 +1,5 @@
-from karld.iter_utils import yield_nth_of
+from iter_karld_tools import yield_nth_of
+
 from karld.loadump import is_file_csv
 from karld.loadump import is_file_json
 from karld.loadump import i_walk_dir_for_filepaths_names

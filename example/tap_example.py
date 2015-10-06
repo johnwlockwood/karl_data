@@ -1,15 +1,16 @@
 #!/usr/bin/env python
-# _*_ coding: utf-8 _*_
+# -*- coding: utf-8 -*-
+
 from functools import partial
 import os
 
-from karld.iter_utils import i_batch
+from iter_karld_tools import i_batch
 
 from karld.loadump import is_file_csv
 from karld.run_together import csv_file_consumer
 from karld.run_together import pool_run_files_to_files
-from karld.tap import Bucket
-from karld.tap import stream_tap
+from stream_tap import Bucket
+from stream_tap import stream_tap
 
 
 def get_fruit(item):

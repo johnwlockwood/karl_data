@@ -1,11 +1,12 @@
 #!/usr/bin/env python
-# _*_ coding: utf-8 _*_
+# -*- coding: utf-8 -*-
+
 import argparse
 from functools import partial
 import os
 
 from karld import is_py3
-from karld.iter_utils import i_batch
+from iter_karld_tools import i_batch
 
 
 if is_py3():
@@ -18,8 +19,8 @@ from karld.run_together import pool_run_files_to_files
 from karld.run_together import serial_run_files_to_files
 from karld.run_together import distribute_run_to_runners
 from karld.run_together import distribute_multi_run_to_runners
-from karld.tap import Bucket
-from karld.tap import stream_tap
+from stream_tap import Bucket
+from stream_tap import stream_tap
 
 
 def get_fruit(item):

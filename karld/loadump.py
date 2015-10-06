@@ -17,8 +17,9 @@ from functools import partial
 
 from operator import itemgetter
 
+from iter_karld_tools import i_batch
+
 from karld import is_py3
-from karld.iter_utils import i_batch
 from karld.unicode_io import csv_reader
 from karld.unicode_io import get_csv_row_writer
 

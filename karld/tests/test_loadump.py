@@ -18,6 +18,7 @@ from nose.plugins.attrib import attr
 
 from karld.loadump import ensure_dir
 from karld.loadump import i_get_unicode_lines
+from karld.loadump import i_get_json_data
 from karld.loadump import i_walk_dir_for_filepaths_names
 from karld.loadump import is_file_csv
 from karld.merger import sort_merge_group
@@ -112,6 +113,30 @@ def combine_things(iterables):
     for group in grouped_items:
         for item in sorted(group[1]):
             yield item
+
+
+@attr('integration')
+class TestReadJSONLines(unittest.TestCase):
+    """
+    Tests i_get_json_data
+    """
+    def setUp(self):
+        self.input_data_path = os.path.join(os.path.dirname(__file__),
+                                            "test_data",
+                                            "things_kinds",
+                                            "people.json")
+
+    def test_i_get_json_data(self):
+        """
+        Ensure entering a file path will produce an iterator
+        dicts loaded from the json lines file.
+        """
+        lines = i_get_json_data(self.input_data_path)
+        first = next(lines)
+        second = next(lines)
+
+        self.assertEqual({u'last': u'smith', u'first': u'John'}, first)
+        self.assertEqual({u'last': u'Jones', u'first': u'Sally'}, second)
 
 
 @attr('integration')

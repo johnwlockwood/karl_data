@@ -1,7 +1,8 @@
-from collections import deque
 from functools import partial
+from operator import methodcaller
 
 try:
+    from itertools import chain
     from itertools import ifilter
     from itertools import imap
 except ImportError:
@@ -10,12 +11,14 @@ except ImportError:
 
 import os
 
-from karld.iter_utils import yield_nth_of
+from iter_karld_tools import i_batch
+from iter_karld_tools import yield_nth_of
 
-from .loadump import ensure_dir
-from .loadump import i_get_csv_data
-from .loadump import i_walk_dir_for_filepaths_names
-from .loadump import write_as_csv
+from karld.loadump import ensure_dir
+from karld.loadump import i_get_csv_data
+from karld.loadump import i_walk_dir_for_filepaths_names
+from karld.loadump import i_read_buffered_binary_file
+from karld.loadump import write_as_csv
 
 
 def csv_file_consumer(csv_rows_consumer, file_path_name):
@@ -123,6 +126,7 @@ def pool_run_files_to_files(file_to_file, in_dir, filter_func=None):
     :returns: A list of return values from the map.
     """
     from concurrent.futures import ProcessPoolExecutor
+
     results = i_walk_dir_for_filepaths_names(in_dir)
     if filter_func:
         results_final = ifilter(filter_func, results)
@@ -131,6 +135,100 @@ def pool_run_files_to_files(file_to_file, in_dir, filter_func=None):
 
     with ProcessPoolExecutor() as pool:
         return list(pool.map(file_to_file, results_final))
+
+
+def distribute_run_to_runners(items_func, in_url, reader=None, batch_size=1100):
+    """
+    With a multi-process pool, map batches of items from
+    file to an items processing function.
+
+    The reader callable should be as fast as possible to
+    reduce data feeder cpu usage. It should do the minimal
+    to produce discrete units of data, save any decoding
+    for the items function.
+
+    :param items_func: Callable that takes multiple items of the data.
+    :param reader: URL reader callable.
+    :param in_url: Url of content
+    :param batch_size: size of batches.
+    """
+    from concurrent.futures import ProcessPoolExecutor
+
+    if not reader:
+        reader = i_read_buffered_binary_file
+
+    stream = reader(in_url)
+    batches = i_batch(batch_size, stream)
+
+    with ProcessPoolExecutor() as pool:
+        return list(pool.map(items_func, batches))
+
+
+def distribute_multi_run_to_runners(items_func, in_dir,
+                                    reader=None,
+                                    walker=None,
+                                    batch_size=1100,
+                                    filter_func=None):
+    """
+    With a multi-process pool, map batches of items from
+    multiple files to an items processing function.
+
+    The reader callable should be as fast as possible to
+    reduce data feeder cpu usage. It should do the minimal
+    to produce discrete units of data, save any decoding
+    for the items function.
+
+    :param items_func: Callable that takes multiple items of the data.
+    :param reader: URL reader callable.
+    :param walker: A generator that takes the in_dir URL and emits
+     url, name tuples.
+    :param batch_size: size of batches.
+    :param filter_func: a function that returns True for desired paths names.
+    """
+    from concurrent.futures import ProcessPoolExecutor
+    from multiprocessing import cpu_count
+
+    if not reader:
+        reader = i_read_buffered_binary_file
+
+    if not walker:
+        walker = i_walk_dir_for_filepaths_names
+
+    paths_names = walker(in_dir)
+    if filter_func:
+        paths_names_final = ifilter(filter_func, paths_names)
+    else:
+        paths_names_final = paths_names
+
+    stream = chain.from_iterable(
+        (reader(in_url) for in_url, name in paths_names_final))
+    batches = i_batch(batch_size, stream)
+
+    n_cpus = cpu_count()
+    max_workers = (n_cpus-1) or 1
+    max_in_queue = int(n_cpus * 1.5)
+    with ProcessPoolExecutor(max_workers=max_workers) as pool:
+        futures = []
+        while True:
+            if len(pool._pending_work_items) < max_in_queue:
+                try:
+                    batch = next(batches)
+                    futures.append(pool.submit(items_func, batch))
+                except StopIteration:
+                    break
+
+    def results():
+        """Generator that yield results of futures
+        that are done. If not done yet, it skips it.
+        """
+        while futures:
+            for index, future in enumerate(futures):
+                if future.done():
+                    yield future.result()
+                    del futures[index]
+                    break
+
+    return results()
 
 
 def serial_run_files_to_files(file_to_file, in_dir, filter_func=None):

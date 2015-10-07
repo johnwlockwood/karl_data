@@ -17,8 +17,9 @@ from functools import partial
 
 from operator import itemgetter
 
+from iter_karld_tools import i_batch
+
 from karld import is_py3
-from karld.iter_utils import i_batch
 from karld.unicode_io import csv_reader
 from karld.unicode_io import get_csv_row_writer
 
@@ -32,6 +33,7 @@ __all__ = ['dump_dicts_to_json_file',
            'ensure_file_path_dir',
            'file_path_and_name',
            'i_get_csv_data',
+           'i_get_json_data',
            'i_read_buffered_file',
            'i_read_buffered_text_file',
            'i_read_buffered_text_file',
@@ -39,13 +41,15 @@ __all__ = ['dump_dicts_to_json_file',
            'i_walk_dir_for_paths_names',
            'identity',
            'is_file_csv',
+           'is_file_json',
            'raw_line_reader',
            'split_csv_file',
            'split_file',
            'split_file_output',
            'split_file_output_csv',
            'split_file_output_json',
-           'write_as_csv']
+           'write_as_csv',
+           'write_as_json']
 
 
 def ensure_dir(directory):
@@ -126,6 +130,18 @@ def i_get_csv_data(file_name, *args, **kwargs):
         yield row
 
 
+def i_get_json_data(file_name, *args, **kwargs):
+    """A generator for reading file with json documents
+    delimited by newlines.
+    """
+    buffering = kwargs.get('buffering', FILE_BUFFER_SIZE)
+    read_file_kwargs = dict(buffering=buffering)
+    data = i_read_buffered_file(file_name, **read_file_kwargs)
+
+    for row in data:
+        yield json.loads(row.decode())
+
+
 def write_as_csv(items, file_name, append=False,
                  line_buffer_size=None, buffering=FILE_BUFFER_SIZE,
                  get_csv_row_writer=get_csv_row_writer):
@@ -176,16 +192,42 @@ def is_file_csv(file_path_name):
     return file_name[-4:].lower() == '.csv'
 
 
-def dump_dicts_to_json_file(file_name, dicts, buffering=FILE_BUFFER_SIZE):
+def is_file_json(file_path_name):
+    """
+    Is the file a json file? Identify by extension.
+
+    :param file_path_name:
+    :type file_path_name: str
+    """
+    _, file_name = file_path_name
+    return file_name[-5:].lower() == '.json'
+
+
+def write_as_json(items, file_name, buffering=FILE_BUFFER_SIZE):
     """writes each dictionary in the dicts iterable
     to a line of the file as json.
 
+    :param items: A sequence of json dumpable objects.
+    :param file_name: the path of the output file.
     :param buffering: number of bytes to buffer files
     :type buffering: int
     """
     with open(file_name, 'w+', buffering=buffering) as json_file:
-        for item in dicts:
+        for item in items:
             json_file.write(json.dumps(item) + os.linesep)
+
+
+def dump_dicts_to_json_file(file_name, dicts, buffering=FILE_BUFFER_SIZE):
+    """writes each dictionary in the dicts iterable
+    to a line of the file as json.
+
+    NOTE: Deprecated. replaced by write_as_json, to match the signature
+     of write_to_csv.
+
+    :param buffering: number of bytes to buffer files
+    :type buffering: int
+    """
+    return write_as_json(dicts, file_name, buffering=buffering)
 
 
 def split_file_output_json(filename, dict_list, out_dir=None, max_lines=1100,
@@ -206,9 +248,9 @@ def split_file_output_json(filename, dict_list, out_dir=None, max_lines=1100,
 
     index = count()
     for group in batches:
-        dump_dicts_to_json_file(
-            os.path.join(out_dir, "{0}_{1}".format(next(index), basename)),
+        write_as_json(
             group,
+            os.path.join(out_dir, "{0}_{1}".format(next(index), basename)),
             buffering=buffering)
 
 

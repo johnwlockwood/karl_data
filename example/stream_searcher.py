@@ -1,20 +1,26 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import argparse
 from functools import partial
 import os
 
 from karld import is_py3
-from karld.iter_utils import i_batch
+from iter_karld_tools import i_batch
 
 
 if is_py3():
     unicode = str
 
 from karld.loadump import is_file_csv
+from karld.loadump import i_get_csv_data
 from karld.run_together import csv_file_consumer
 from karld.run_together import pool_run_files_to_files
 from karld.run_together import serial_run_files_to_files
-from karld.tap import Bucket
-from karld.tap import stream_tap
+from karld.run_together import distribute_run_to_runners
+from karld.run_together import distribute_multi_run_to_runners
+from stream_tap import Bucket
+from stream_tap import stream_tap
 
 
 def get_fruit(item):
@@ -105,6 +111,68 @@ def run(in_dir, pool):
         print(metal)
 
 
+def run_distribute(in_path):
+    """
+    Run the composition of csv_file_consumer and information tap
+    with the csv files in the input directory, and collect
+    the results from each file and merge them together,
+    printing both kinds of results.
+    """
+
+    results = distribute_run_to_runners(
+        certain_kind_tap,
+        in_path, reader=i_get_csv_data, batch_size=3)
+
+    fruit_results = []
+    metal_results = []
+
+    for fruits, metals in results:
+        for fruit in fruits:
+            fruit_results.append(fruit)
+
+        for metal in metals:
+            metal_results.append(metal)
+
+    print("=== fruits ===")
+    for fruit in fruit_results:
+        print(fruit)
+
+    print("=== metals ===")
+    for metal in metal_results:
+        print(metal)
+
+
+def run_distribute_multi(in_dir):
+    """
+    Run the composition of csv_file_consumer and information tap
+    with the csv files in the input directory, and collect
+    the results from each file and merge them together,
+    printing both kinds of results.
+    """
+
+    results = distribute_multi_run_to_runners(
+        certain_kind_tap,
+        in_dir, reader=i_get_csv_data, batch_size=3, filter_func=is_file_csv)
+
+    fruit_results = []
+    metal_results = []
+
+    for fruits, metals in results:
+        for fruit in fruits:
+            fruit_results.append(fruit)
+
+        for metal in metals:
+            metal_results.append(metal)
+
+    print("=== fruits ===")
+    for fruit in fruit_results:
+        print(fruit)
+
+    print("=== metals 䤗 ===")
+    for metal in metal_results:
+        print(metal)
+
+
 def main(*args):
     """
     Try it::
@@ -127,10 +195,22 @@ def main(*args):
     parser.add_argument("--in-dir",
                         default=os.path.join("test_data", "things_kinds"),
                         help="Data source directory")
-    parser.add_argument("--pool", default=False)
+    parser.add_argument("--in-file",
+                        default=None,
+                        help="Data source file")
+    parser.add_argument("--single", help="Use a single process. "
+                                         "Helpful for debugging")
     args = parser.parse_args()
 
-    run(args.in_dir, args.pool)
+    if args.in_file:
+        print("file")
+        run_distribute(args.in_file)
+    elif args.single:
+        print("single")
+        run(args.in_dir, False)
+    else:
+        print("multi")
+        run_distribute_multi(args.in_dir)
 
 
 if __name__ == "__main__":

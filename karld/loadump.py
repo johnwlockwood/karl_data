@@ -139,7 +139,7 @@ def i_get_json_data(file_name, *args, **kwargs):
     data = i_read_buffered_file(file_name, **read_file_kwargs)
 
     for row in data:
-        yield json.loads(row)
+        yield json.loads(row.decode())
 
 
 def write_as_csv(items, file_name, append=False,

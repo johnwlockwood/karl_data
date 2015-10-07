@@ -14,11 +14,11 @@ import os
 from iter_karld_tools import i_batch
 from iter_karld_tools import yield_nth_of
 
-from .loadump import ensure_dir
-from .loadump import i_get_csv_data
-from .loadump import i_walk_dir_for_filepaths_names
-from .loadump import i_read_buffered_binary_file
-from .loadump import write_as_csv
+from karld.loadump import ensure_dir
+from karld.loadump import i_get_csv_data
+from karld.loadump import i_walk_dir_for_filepaths_names
+from karld.loadump import i_read_buffered_binary_file
+from karld.loadump import write_as_csv
 
 
 def csv_file_consumer(csv_rows_consumer, file_path_name):

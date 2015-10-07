@@ -99,7 +99,7 @@ class TestDistributeMulti(unittest.TestCase):
 def json_values(items):
     results = []
     for item in items:
-        results.append(json.loads(item).get('first'))
+        results.append(json.loads(item.decode()).get('first'))
 
     return results
 
@@ -174,7 +174,8 @@ class TestCSVFileToFile(unittest.TestCase):
         else:
             with open(expected_file, 'r') as result_file:
                 contents = result_file.read()
-                self.assertEqual(expected_data.splitlines(), contents.decode('utf-8').splitlines())
+                self.assertEqual(expected_data.splitlines(),
+                                 contents.decode('utf-8').splitlines())
 
         if os.path.exists(expected_file):
             os.remove(expected_file)
@@ -185,7 +186,7 @@ class TestCSVFileToFile(unittest.TestCase):
         Ensure csv_file_consumer calls it's csv_rows_consumer
         with the csv rows from the file.
         """
-        from ..run_together import csv_file_consumer
+        from karld.run_together import csv_file_consumer
         from karld.loadump import file_path_and_name
 
         input_path = os.path.join(os.path.dirname(__file__),

@@ -44,10 +44,17 @@ class TestDistributeMulti(unittest.TestCase):
         self.assertEqual(len(list_results[0]), 10)
         self.assertEqual(len(list_results[1]), 5)
 
-        self.assertEqual(
-            sorted(chain.from_iterable(list_results)),
-            ['W', 'a', 'c', 'c', 'c', 'd',
-             'i', 'm', 'o', 'p', 'p', 'r', 't', 't', 't'],
+        if is_py3():
+            self.assertequal(
+                sorted(chain.from_iterable(list_results)),
+                [87, 97, 99, 99, 99, 100, 105,
+                 109, 111, 112, 112, 114, 116, 116, 116]
+            )
+        else:
+            self.assertequal(
+                sorted(chain.from_iterable(list_results)),
+                ['w', 'a', 'c', 'c', 'c', 'd',
+                 'i', 'm', 'o', 'p', 'p', 'r', 't', 't', 't'],
             )
 
     @attr('integration')

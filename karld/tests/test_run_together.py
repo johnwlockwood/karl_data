@@ -5,6 +5,7 @@ import unittest
 from datetime import datetime
 import json
 
+from itertools import chain
 
 from nose.plugins.attrib import attr
 from karld import is_py3
@@ -37,14 +38,17 @@ class TestDistributeMulti(unittest.TestCase):
             in_dir=input_path,
             batch_size=10,
             filter_func=karld.io.is_file_csv)
+
         list_results = list(test_results)
 
+        self.assertEqual(len(list_results[0]), 10)
+        self.assertEqual(len(list_results[1]), 5)
+
         self.assertEqual(
-            list_results,
-            [
-                ['m', 't', 't', 'i', 'd', 'a', 'c', 'p', 'c', 'p'],
-                ['r', 't', 'c', 'o', 'W']
-            ])
+            sorted(chain.from_iterable(list_results)),
+            ['W', 'a', 'c', 'c', 'c', 'd',
+             'i', 'm', 'o', 'p', 'p', 'r', 't', 't', 't'],
+            )
 
     @attr('integration')
     def test_csv_reader(self):
@@ -73,15 +77,15 @@ class TestDistributeMulti(unittest.TestCase):
         list_results = list(test_results)
 
         self.assertEqual(len(list_results), 5)
+        self.assertEqual(len(list_results[0]), 3)
 
         self.assertEqual(
-            list_results[0],
-            [u'mushroom', u'tomato', u'topaz']
-        )
-
-        self.assertEqual(
-            list_results[-1],
-            [u'cat', u'orange', u'W\u0104\u017b']
+            sorted(chain.from_iterable(list_results)),
+            [u'W\u0104\u017b', u'apple', u'cat',
+             u'celery', u'cheese', u'dr\xf3\u017ck\u0105',
+             u'iron', u'mushroom', u'orange',
+             u'peach', u'pear', u'ruby',
+             u'titanium', u'tomato', u'topaz']
         )
 
 

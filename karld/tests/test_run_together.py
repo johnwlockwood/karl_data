@@ -3,11 +3,120 @@ import os
 import tempfile
 import unittest
 from datetime import datetime
+import json
+
 
 from nose.plugins.attrib import attr
 from karld import is_py3
 
 str_upper = methodcaller('upper')
+
+
+def collect_first(items):
+    results = []
+    for item in items:
+        results.append(item[0])
+
+    return results
+
+
+class TestDistributeMulti(unittest.TestCase):
+    @attr('integration')
+    def test_default_reader(self):
+        """
+        Ensure results have given items_func, collect_first, applied to them.
+        """
+        import karld
+        from karld.run_together import distribute_multi_run_to_runners
+        input_path = os.path.join(os.path.dirname(__file__),
+                                  "test_data",
+                                  "things_kinds")
+
+        test_results = distribute_multi_run_to_runners(
+            collect_first,
+            in_dir=input_path,
+            batch_size=10,
+            filter_func=karld.io.is_file_csv)
+        list_results = list(test_results)
+
+        self.assertEqual(
+            list_results,
+            [
+                ['m', 't', 't', 'i', 'd', 'a', 'c', 'p', 'c', 'p'],
+                ['r', 't', 'c', 'o', 'W']
+            ])
+
+    @attr('integration')
+    def test_csv_reader(self):
+        """
+        Ensure results have the function applied to them.
+
+        Ensure only csv files are read.
+
+        Ensure the batches of results match batch_size.
+
+        Ensure the given function is applied to the items
+        of a batch.
+        """
+        import karld
+        from karld.run_together import distribute_multi_run_to_runners
+        input_path = os.path.join(os.path.dirname(__file__),
+                                  "test_data",
+                                  "things_kinds")
+
+        test_results = distribute_multi_run_to_runners(
+            collect_first,
+            in_dir=input_path,
+            reader=karld.io.i_get_csv_data,
+            batch_size=3,
+            filter_func=karld.io.is_file_csv)
+        list_results = list(test_results)
+
+        self.assertEqual(len(list_results), 5)
+
+        self.assertEqual(
+            list_results[0],
+            [u'mushroom', u'tomato', u'topaz']
+        )
+
+        self.assertEqual(
+            list_results[-1],
+            [u'cat', u'orange', u'W\u0104\u017b']
+        )
+
+
+def json_values(items):
+    results = []
+    for item in items:
+        results.append(json.loads(item).get('first'))
+
+    return results
+
+
+class TestDistribute(unittest.TestCase):
+    @attr('integration')
+    def test_default_reader(self):
+        """
+        Ensure results have the items_func applied to them
+        and were processed in batches of batch_size.
+        """
+        from karld.run_together import distribute_run_to_runners
+        input_path = os.path.join(os.path.dirname(__file__),
+                                  "test_data",
+                                  "things_kinds",
+                                  "people.json")
+
+        test_results = distribute_run_to_runners(
+            json_values,
+            input_path,
+            batch_size=1)
+
+        self.assertEqual(
+            test_results,
+            [
+                [u'John'],
+                [u'Sally']
+            ])
 
 
 class TestCSVFileToFile(unittest.TestCase):
@@ -17,7 +126,7 @@ class TestCSVFileToFile(unittest.TestCase):
         Ensure
         """
         from karld.loadump import file_path_and_name
-        from ..run_together import csv_file_to_file
+        from karld.run_together import csv_file_to_file
 
         out_dir = os.path.join(tempfile.gettempdir(),
                                "karld_test_csv_file_to_file")

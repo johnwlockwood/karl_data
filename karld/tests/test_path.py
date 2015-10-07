@@ -37,7 +37,7 @@ class TestIWalkJson(unittest.TestCase):
                                   "things_kinds")
 
         json_paths = list(i_walk_json_paths(input_path))
-        self.assertEqual(1, len(json_paths))
+        self.assertEqual(2, len(json_paths))
         for path in json_paths:
             self.assertIn('.json', path)
 
